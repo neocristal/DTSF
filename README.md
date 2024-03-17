@@ -1,6 +1,56 @@
 # DSTF
 Data Transfer Security Framework refers to a set of protocols, standards, and practices used to ensure the secure transmission of data between systems or across networks. This framework encompasses various security measures aimed at protecting data from unauthorized access, interception, tampering, and other threats during transit. Some key components of a data transfer security framework include:
 
+**Audiences**
+* U.S. Businesses
+* European Businesses
+* European Individuals
+* Data Protection Authorities
+
+**I. Overview**
+**II. Principles**
+1. Notice
+2. Choice
+3. Accountability for Onward Transfer
+4. Security
+5. Data Integrity and Purpose Limitation
+6. Access
+7. Recourse, Enforcement and Liability
+**III. Supplemental Principles**
+1. Sensitive Data
+2. Journalistic Exceptions
+3. Secondary Liability
+4. Performing Due Diligence and Conducting Audits
+5. The Role of the Data Protection Authorities
+(a) - (b)
+(c)
+(d) - (e)
+6. Self-Certification
+7. Verification
+8. Access
+9. Human Resources Data
+10. Obligatory Contracts for Onward Transfers
+11. Dispute Resolution and Enforcement
+(a) - (c)
+(d) - (e)
+(f) - (g)
+12. Choice – Timing of Opt Out
+13. Travel Information
+14. Pharmaceutical and Medical Products
+15. Public Record and Publicly Available Information
+16. Access Requests by Public Authorities
+
+**Annex I: Arbitral Model**
+**Introduction**
+A. Scope
+B. Available Remedies
+C. Pre-Arbitration Requirements
+D. Binding Nature of Decisions
+E. Review and Enforcement
+F. The Arbitration Panel
+G. Arbitration Procedures
+H. Costs
+
 # Encryption: 
 Encrypting data before transmission to ensure confidentiality. This involves converting plaintext data into ciphertext using cryptographic algorithms and keys, making it unreadable to unauthorized users.
 # Secure Communication Protocols: 
