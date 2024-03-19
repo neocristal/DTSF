@@ -12,7 +12,7 @@ Data Transfer Security Framework refers to a set of protocols, standards, and pr
 
 Data transfer security is a critical aspect of information security, ensuring that data exchanged between systems, networks, or devices remains confidential, integral, and available. A Data Transfer Security Framework provides guidelines, protocols, and best practices to mitigate risks associated with data transmission and prevent unauthorized access, interception, or tampering. Here are the key components and principles of such a framework:
 
-**1. [Encryption](main/Access-Controls.md):** Encryption is fundamental to data transfer security. It involves encoding data into an unreadable format using cryptographic algorithms, making it indecipherable to unauthorized parties. Implementing encryption protocols such as SSL/TLS for web traffic, IPSec for network communication, and PGP for email ensures that data remains confidential during transit.
+**1. [Encryption](/Access-Controls.md):** Encryption is fundamental to data transfer security. It involves encoding data into an unreadable format using cryptographic algorithms, making it indecipherable to unauthorized parties. Implementing encryption protocols such as SSL/TLS for web traffic, IPSec for network communication, and PGP for email ensures that data remains confidential during transit.
 
 **2. Secure Protocols:** Utilizing secure communication protocols enhances data transfer security. Protocols like HTTPS for web browsing, SFTP/FTPS for file transfer, and SSH for remote access offer encryption and authentication mechanisms to safeguard data in transit. These protocols authenticate endpoints, establish secure channels, and prevent eavesdropping or man-in-the-middle attacks.
 
