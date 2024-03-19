@@ -26,7 +26,7 @@ Data transfer security is a critical aspect of information security, ensuring th
 
 **7. Compliance and Standards:** Adhering to regulatory requirements and industry standards is essential for data transfer security. Compliance frameworks like GDPR, HIPAA, or PCI DSS mandate encryption, access controls, and data protection measures to safeguard sensitive information during transit. Following established security standards such as ISO 27001 or NIST guidelines ensures the implementation of robust data transfer security practices.
 
-(/diagram-dstf.jpg)
+![Data Security Transfer Framework](https://github.com/neocristal/DSTF/blob/main/diagram-dstf.jpg?raw=true)
 
 In conclusion, a comprehensive Data Transfer Security Framework encompasses encryption, secure protocols, authentication, access controls, data integrity measures, logging, monitoring, and compliance standards to protect data during transmission. By adopting a layered approach to data transfer security, organizations can mitigate risks, safeguard sensitive information, and maintain trust in their digital communications infrastructure.
 
