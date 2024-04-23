@@ -1,4 +1,4 @@
-# DSTF v0.1.2 (alfa)
+# DTSF v0.1.2 (alfa)
 Data Transfer Security Framework refers to a set of protocols, standards, and practices used to ensure the secure transmission of data between systems or across networks. This framework encompasses various security measures aimed at protecting data from unauthorized access, interception, tampering, and other threats during transit. Some key components of a data transfer security framework include:
 
 **Audiences**
@@ -14,7 +14,7 @@ Data transfer security is a critical aspect of information security, ensuring th
 
 **1. [Encryption](/Encryption-Protocols.md):** Encryption is fundamental to data transfer security. It involves encoding data into an unreadable format using cryptographic algorithms, making it indecipherable to unauthorized parties. Implementing encryption protocols such as SSL/TLS for web traffic, IPSec for network communication, and PGP for email ensures that data remains confidential during transit.
 
-**2. [Secure Protocols](/DSTF-Protocols.md):** Utilizing secure communication protocols enhances data transfer security. Protocols like HTTPS for web browsing, SFTP/FTPS for file transfer, and SSH for remote access offer encryption and authentication mechanisms to safeguard data in transit. These protocols authenticate endpoints, establish secure channels, and prevent eavesdropping or man-in-the-middle attacks.
+**2. [Secure Protocols](/DTSF-Protocols.md):** Utilizing secure communication protocols enhances data transfer security. Protocols like HTTPS for web browsing, SFTP/FTPS for file transfer, and SSH for remote access offer encryption and authentication mechanisms to safeguard data in transit. These protocols authenticate endpoints, establish secure channels, and prevent eavesdropping or man-in-the-middle attacks.
 
 **3. Authentication:** Authentication mechanisms verify the identities of communicating parties to ensure trust and integrity during data exchange. Implementing strong authentication methods such as digital certificates, username/password authentication, or multi-factor authentication (MFA) helps prevent unauthorized access and ensures the confidentiality of transmitted data.
 
