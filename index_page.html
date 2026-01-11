@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DTSF v0.1.2 Interactive Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Custom Font */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F4; /* Warm Stone 100 */
+            color: #44403C; /* Stone 700 */
+        }
+
+        /* Chart Container Styling - MANDATORY */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+
+        /* Custom Scrollbar for internal panels */
+        .custom-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: #E7E5E4;
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background-color: #A8A29E;
+            border-radius: 10px;
+        }
+
+        /* Tab Active State */
+        .tab-active {
+            border-bottom: 2px solid #D97706; /* Amber 600 */
+            color: #78350F; /* Amber 900 */
+            font-weight: 600;
+        }
+
+        /* Card Hover */
+        .interactive-card {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .interactive-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border-color: #D97706;
+        }
+        
+        /* Flowchart Steps */
+        .step-node {
+            transition: all 0.3s ease;
+        }
+        .step-node:hover {
+            background-color: #FEF3C7; /* Amber 100 */
+            border-color: #F59E0B;
+        }
+        .step-node.active-step {
+            background-color: #FDE68A; /* Amber 200 */
+            border-color: #D97706; /* Amber 600 */
+            font-weight: bold;
+        }
+    </style>
+    <!-- Chosen Palette: Warm Neutrals & Earthy Accents -->
+    <!-- Background: Stone 100 (#F5F5F4) -->
+    <!-- Text: Stone 700 (#44403C) -->
+    <!-- Primary Interaction: Amber 600 (#D97706) -->
+    <!-- Secondary/Charts: Teal 500 (#14B8A6), Rose 400 (#FB7185), Indigo 400 (#818CF8) -->
+
+    <!-- Application Structure Plan: 
+         I designed a "Dashboard" structure divided into three distinct logical views to handle the density of the report:
+         1. "Strategic Overview": Focuses on the high-level framework components and principles. Uses a Radar chart for the 7 pillars to show holistic coverage.
+         2. "Technical Implementation": Focuses on the "How-To" (Lifecycle and Programming). Uses a flow diagram and bar chart to break down processes.
+         3. "Governance & Compliance": Focuses on the legal/regulatory side. Uses a Doughnut chart for audiences and an interactive list for principles.
+         User Flow: The user lands on the Overview to understand "What is DTSF?". They navigate to Technical to see "How do I build it?", and Governance to see "What are the rules?". 
+         This separates concerns (Management vs. Devs vs. Legal) while keeping everything accessible.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Radar Chart (Overview): Goal: Relationship/Holistic View. Justification: The framework has 7 distinct but equal components. A radar chart visualizes the "shape" of security coverage perfectly.
+         2. Interactive Flowchart (Technical): Goal: Process/Change. Justification: The "Lifecycle Procedure" is a linear sequence. A CSS-based flow allows users to step through it interactively without static images.
+         3. Horizontal Bar Chart (Technical): Goal: Compare/Rank. Justification: "Programming Data Security" lists several practices. A bar chart implies a stack of necessary layers/priorities.
+         4. Doughnut Chart (Governance): Goal: Inform/Part-to-Whole. Justification: Visualizes the ecosystem of stakeholders (Audiences) simply.
+         
+         CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. All visuals are Chart.js (Canvas) or HTML/CSS.
+    -->
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white border-b border-stone-200 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl mr-2">&#128737;</span> <!-- Unicode Shield -->
+                    <div>
+                        <h1 class="text-xl font-bold text-stone-800 tracking-tight">DTSF Explorer</h1>
+                        <p class="text-xs text-stone-500 font-mono">v0.1.2 (Alfa)</p>
+                    </div>
+                </div>
+                <!-- Navigation Tabs -->
+                <nav class="hidden md:flex space-x-8">
+                    <button onclick="switchTab('overview')" id="tab-overview" class="tab-active text-sm font-medium px-1 pt-1 pb-1 transition-colors">Strategic Overview</button>
+                    <button onclick="switchTab('technical')" id="tab-technical" class="text-stone-500 hover:text-stone-700 text-sm font-medium px-1 pt-1 pb-1 transition-colors">Technical Implementation</button>
+                    <button onclick="switchTab('governance')" id="tab-governance" class="text-stone-500 hover:text-stone-700 text-sm font-medium px-1 pt-1 pb-1 transition-colors">Governance & Compliance</button>
+                </nav>
+                <!-- Mobile Menu Button (simplified for SPA) -->
+                <div class="md:hidden">
+                    <button onclick="toggleMobileMenu()" class="text-stone-500 hover:text-stone-900 focus:outline-none">
+                        &#9776; <!-- Hamburger -->
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Nav Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-stone-50 border-t border-stone-200 p-4">
+            <button onclick="switchTab('overview')" class="block w-full text-left py-2 text-stone-700 font-medium">Strategic Overview</button>
+            <button onclick="switchTab('technical')" class="block w-full text-left py-2 text-stone-700 font-medium">Technical Implementation</button>
+            <button onclick="switchTab('governance')" class="block w-full text-left py-2 text-stone-700 font-medium">Governance & Compliance</button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+
+        <!-- VIEW 1: STRATEGIC OVERVIEW -->
+        <div id="view-overview" class="space-y-8 animate-fade-in">
+            <!-- Intro Block -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">Safeguarding Information in Transit</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    The Data Transfer Security Framework (DTSF) establishes a comprehensive set of protocols, standards, and practices to ensure the confidentiality, integrity, and availability of data as it moves between systems. This section visualizes the core components that make up the framework's defensive posture.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Chart Section: The 7 Pillars -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100 flex flex-col">
+                    <h3 class="text-lg font-semibold text-stone-800 mb-4 flex items-center">
+                        <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2 py-1 rounded mr-2">INTERACTIVE</span>
+                        The 7 Pillars of Security
+                    </h3>
+                    <p class="text-sm text-stone-500 mb-4">Click on the radar points below to explore each component detail.</p>
+                    
+                    <div class="chart-container flex-grow">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Detail Panel: Contextual Info -->
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100 flex flex-col">
+                    <h3 class="text-lg font-semibold text-stone-800 mb-4">Component Details</h3>
+                    <div id="pillar-details" class="flex-grow flex flex-col justify-center items-center text-center p-4 bg-stone-50 rounded-lg border border-dashed border-stone-300">
+                        <span class="text-4xl mb-3 text-stone-300">&#128269;</span>
+                        <p class="text-stone-500 font-medium">Select a pillar on the chart to view its definition and requirements.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Core Principles Cards -->
+            <div>
+                <h3 class="text-xl font-bold text-stone-800 mb-4 px-2">Core Framework Principles</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Cards injected via JS -->
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Notice</div>
+                        <p class="text-sm text-stone-600">Obligation to inform users about data collection practices.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Choice</div>
+                        <p class="text-sm text-stone-600">Providing mechanisms for users to opt-out of data usage.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Accountability</div>
+                        <p class="text-sm text-stone-600">Responsibility for onward transfer to third parties.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Security</div>
+                        <p class="text-sm text-stone-600">Maintaining reasonable measures to protect data.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Data Integrity</div>
+                        <p class="text-sm text-stone-600">Limiting processing to the purposes for which it was collected.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Access</div>
+                        <p class="text-sm text-stone-600">Allowing individuals to view their stored personal data.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm border border-stone-200">
+                        <div class="font-bold text-amber-700 mb-1">Recourse</div>
+                        <p class="text-sm text-stone-600">Mechanisms for enforcement, liability, and dispute resolution.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 2: TECHNICAL IMPLEMENTATION -->
+        <div id="view-technical" class="hidden space-y-8 animate-fade-in">
+            <!-- Intro Block -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">Technical Implementation & Lifecycle</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    Implementing DTSF requires specific actions throughout the data lifecycle, from reception to storage. This section outlines the required engineering protocols and the programming security measures that developers must integrate into applications.
+                </p>
+            </div>
+
+            <!-- Lifecycle Flowchart -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                <h3 class="text-lg font-semibold text-stone-800 mb-6">Data Security Lifecycle Procedure</h3>
+                <!-- Custom Responsive Flowchart -->
+                <div class="flex flex-col md:flex-row justify-between items-center gap-4 relative">
+                    <!-- Step 1 -->
+                    <div class="w-full md:w-1/6 p-4 rounded-lg border-2 border-stone-200 bg-stone-50 step-node cursor-pointer group" onclick="showStepDetail(1)">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">&#128274;</div>
+                        <h4 class="font-bold text-sm text-stone-800">1. Encryption</h4>
+                        <div class="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 text-stone-300">&#10145;</div>
+                    </div>
+                    
+                    <!-- Step 2 -->
+                    <div class="w-full md:w-1/6 p-4 rounded-lg border-2 border-stone-200 bg-stone-50 step-node cursor-pointer group" onclick="showStepDetail(2)">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">&#9989;</div>
+                        <h4 class="font-bold text-sm text-stone-800">2. Input Validation</h4>
+                        <div class="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 text-stone-300">&#10145;</div>
+                    </div>
+
+                    <!-- Step 3 -->
+                    <div class="w-full md:w-1/6 p-4 rounded-lg border-2 border-stone-200 bg-stone-50 step-node cursor-pointer group" onclick="showStepDetail(3)">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">&#128100;</div>
+                        <h4 class="font-bold text-sm text-stone-800">3. Access Control</h4>
+                        <div class="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 text-stone-300">&#10145;</div>
+                    </div>
+
+                    <!-- Step 4 -->
+                    <div class="w-full md:w-1/6 p-4 rounded-lg border-2 border-stone-200 bg-stone-50 step-node cursor-pointer group" onclick="showStepDetail(4)">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">&#9881;</div>
+                        <h4 class="font-bold text-sm text-stone-800">4. Secure Processing</h4>
+                        <div class="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 text-stone-300">&#10145;</div>
+                    </div>
+
+                    <!-- Step 5 -->
+                    <div class="w-full md:w-1/6 p-4 rounded-lg border-2 border-stone-200 bg-stone-50 step-node cursor-pointer group" onclick="showStepDetail(5)">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">&#128640;</div>
+                        <h4 class="font-bold text-sm text-stone-800">5. Secure Transfer</h4>
+                        <div class="hidden md:block absolute top-1/2 -right-3 transform -translate-y-1/2 z-10 text-stone-300">&#10145;</div>
+                    </div>
+
+                    <!-- Step 6 -->
+                    <div class="w-full md:w-1/6 p-4 rounded-lg border-2 border-stone-200 bg-stone-50 step-node cursor-pointer group" onclick="showStepDetail(6)">
+                        <div class="text-2xl mb-2 group-hover:scale-110 transition-transform">&#128190;</div>
+                        <h4 class="font-bold text-sm text-stone-800">6. Secure Storage</h4>
+                    </div>
+                </div>
+
+                <!-- Dynamic Detail Box for Flowchart -->
+                <div id="lifecycle-detail" class="mt-6 p-4 bg-amber-50 border-l-4 border-amber-500 rounded-r-lg text-stone-700 text-sm">
+                    <p class="font-medium">Interact with the process flow above to see implementation details.</p>
+                </div>
+            </div>
+
+            <!-- Programming Security Bar Chart -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                    <h3 class="text-lg font-semibold text-stone-800 mb-4">Programming Data Security Measures</h3>
+                    <p class="text-sm text-stone-500 mb-4">Relative importance and implementation priority of developer-centric security practices.</p>
+                    <div class="chart-container">
+                        <canvas id="programmingChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                    <h3 class="text-lg font-semibold text-stone-800 mb-4">Developer Best Practices</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-teal-500 font-bold mr-2">&#10003;</span>
+                            <div>
+                                <strong class="text-stone-800 block text-sm">Input Validation</strong>
+                                <span class="text-xs text-stone-500">Sanitize all inputs to prevent SQL injection and XSS.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-500 font-bold mr-2">&#10003;</span>
+                            <div>
+                                <strong class="text-stone-800 block text-sm">Secure Communication</strong>
+                                <span class="text-xs text-stone-500">Use HTTPS/TLS for all data transmission between components.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-500 font-bold mr-2">&#10003;</span>
+                            <div>
+                                <strong class="text-stone-800 block text-sm">Data Masking</strong>
+                                <span class="text-xs text-stone-500">Anonymize sensitive data in non-production/testing environments.</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-teal-500 font-bold mr-2">&#10003;</span>
+                            <div>
+                                <strong class="text-stone-800 block text-sm">Auditing & Logging</strong>
+                                <span class="text-xs text-stone-500">Robust tracking of access and suspicious behavior.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 3: GOVERNANCE & COMPLIANCE -->
+        <div id="view-governance" class="hidden space-y-8 animate-fade-in">
+            <!-- Intro Block -->
+            <div class="bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                <h2 class="text-2xl font-bold text-stone-800 mb-2">Governance, Audiences & Supplemental Principles</h2>
+                <p class="text-stone-600 leading-relaxed">
+                    Effective data transfer requires adherence to legal frameworks and the specific needs of various stakeholders. This section details who is involved, the supplemental principles for specific scenarios, and the dispute resolution mechanisms.
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Audiences Chart -->
+                <div class="lg:col-span-1 bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                    <h3 class="text-lg font-semibold text-stone-800 mb-4">Target Audiences</h3>
+                    <div class="chart-container" style="height: 300px;">
+                        <canvas id="audienceChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-xs text-center text-stone-500">
+                        Primary stakeholders impacted by DTSF regulations.
+                    </div>
+                </div>
+
+                <!-- Interactive Lists -->
+                <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6 border border-stone-100">
+                    <div class="mb-6">
+                        <h3 class="text-lg font-semibold text-stone-800 mb-4">Supplemental Principles Explorer</h3>
+                        <p class="text-sm text-stone-500 mb-4">Filter through specific compliance scenarios.</p>
+                        
+                        <input type="text" id="principleSearch" onkeyup="filterPrinciples()" placeholder="Search principles (e.g., 'Medical', 'Audit')..." class="w-full p-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-500 mb-4 text-sm">
+                        
+                        <div id="principlesList" class="custom-scroll overflow-y-auto max-h-64 space-y-2">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+
+                    <div class="border-t border-stone-200 pt-6">
+                        <h3 class="text-lg font-semibold text-stone-800 mb-2">Annex I: Arbitral Model</h3>
+                        <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div class="bg-stone-50 p-3 rounded">
+                                <span class="font-bold block text-stone-700">Pre-Arbitration</span>
+                                <span class="text-stone-500 text-xs">Mandatory requirements before filing.</span>
+                            </div>
+                            <div class="bg-stone-50 p-3 rounded">
+                                <span class="font-bold block text-stone-700">Binding Nature</span>
+                                <span class="text-stone-500 text-xs">Decisions are final and enforceable.</span>
+                            </div>
+                            <div class="bg-stone-50 p-3 rounded">
+                                <span class="font-bold block text-stone-700">The Panel</span>
+                                <span class="text-stone-500 text-xs">Selection and authority of arbitrators.</span>
+                            </div>
+                            <div class="bg-stone-50 p-3 rounded">
+                                <span class="font-bold block text-stone-700">Costs</span>
+                                <span class="text-stone-500 text-xs">Fee structures and liability.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-stone-900 text-stone-400 py-6 mt-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-4 md:mb-0">
+                <span class="font-bold text-stone-200">DTSF</span> v0.1.2 (Alfa)
+            </div>
+            <div class="text-sm">
+                Generated based on official documentation. No SVG/Mermaid used.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Logic -->
+    <script>
+        // --- Data Definitions ---
+
+        // Radar Data (Overview)
+        const frameworkComponents = {
+            labels: ['Encryption', 'Secure Protocols', 'Authentication', 'Access Controls', 'Data Integrity', 'Logging & Monitoring', 'Compliance'],
+            data: [90, 85, 80, 75, 85, 70, 95], // Conceptual "Criticality" score based on text emphasis
+            descriptions: [
+                "Fundamental to security. Encoding data into unreadable format (SSL/TLS, IPSec, PGP) to ensure confidentiality.",
+                "Using HTTPS, SFTP, SSH to offer encryption and authentication, preventing eavesdropping and MITM attacks.",
+                "Verifying identities via Digital Certs, Passwords, or MFA to ensure trust during exchange.",
+                "Restricting access based on permissions (RBAC, ABAC) to prevent unauthorized interception.",
+                "Using hashing (SHA-256) and digital signatures to guarantee data remains unchanged and uncorrupted.",
+                "Continuous tracking of traffic and logs (SIEM, IDS) to detect anomalies and breaches promptly.",
+                "Adhering to GDPR, HIPAA, PCI DSS, ISO 27001 to ensure legal and regulatory alignment."
+            ]
+        };
+
+        // Programming Security Data (Technical)
+        const progSecurityData = {
+            labels: ['Input Validation', 'Encryption (Rest/Transit)', 'Access Control', 'Secure Storage', 'Secure Coding', 'Auditing'],
+            data: [95, 90, 85, 80, 75, 70] // Conceptual Priority
+        };
+
+        // Audience Data (Governance)
+        const audienceData = {
+            labels: ['U.S. Businesses', 'European Businesses', 'European Individuals', 'Data Protection Authorities'],
+            data: [35, 35, 20, 10] // Rough distribution estimation
+        };
+
+        // Supplemental Principles List
+        const principlesList = [
+            { title: "Sensitive Data", desc: "Special handling for medical, race, political, religious data." },
+            { title: "Journalistic Exceptions", desc: "Balancing privacy with freedom of the press." },
+            { title: "Secondary Liability", desc: "Responsibility when third parties fail to comply." },
+            { title: "Audits", desc: "Due diligence and periodic verification of security measures." },
+            { title: "Self-Certification", desc: "Organizations declaring their own compliance status." },
+            { title: "Human Resources Data", desc: "Specific protections for employee information." },
+            { title: "Obligatory Contracts", desc: "Mandatory agreements for onward transfers." },
+            { title: "Pharmaceutical/Medical", desc: "Specific regulations for health products." },
+            { title: "Public Authority Access", desc: "Protocols for government data requests." }
+        ];
+
+        // Lifecycle Steps Data
+        const lifecycleSteps = {
+            1: { title: "Encryption", text: "Upon receiving primary data, encrypt immediately using strong algorithms to protect from interception." },
+            2: { title: "Input Validation", text: "Validate and sanitize all data to prevent SQL injection, XSS, and command injection before processing." },
+            3: { title: "Access Control", text: "Restrict access based on user roles (RBAC). Only authorized systems/users can touch the data." },
+            4: { title: "Secure Processing", text: "Process in a secure environment, avoiding buffer overflows and insecure deserialization." },
+            5: { title: "Secure Transfer", text: "Transfer to storage using HTTPS/TLS protocols. Ensure data remains encrypted in transit." },
+            6: { title: "Secure Storage", text: "Store in secure databases with encryption, access controls, and integrity checks." }
+        };
+
+        // --- Chart Config Utils ---
+        
+        // Label Splitter for Chart.js (16 char limit)
+        function splitLabel(str) {
+            const maxLen = 16;
+            if (str.length <= maxLen) return str;
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + " " + words[i]).length <= maxLen) {
+                    currentLine += " " + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        const commonTooltip = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    return Array.isArray(label) ? label.join(' ') : label;
+                }
+            }
+        };
+
+        // --- Interaction Logic ---
+
+        function switchTab(tabId) {
+            // Hide all views
+            document.getElementById('view-overview').classList.add('hidden');
+            document.getElementById('view-technical').classList.add('hidden');
+            document.getElementById('view-governance').classList.add('hidden');
+            
+            // Show selected view
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+
+            // Update Tab Styles
+            const tabs = ['overview', 'technical', 'governance'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`tab-${t}`);
+                if (t === tabId) {
+                    btn.classList.add('tab-active', 'text-amber-900');
+                    btn.classList.remove('text-stone-500');
+                } else {
+                    btn.classList.remove('tab-active', 'text-amber-900');
+                    btn.classList.add('text-stone-500');
+                }
+            });
+
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        }
+
+        function showStepDetail(stepId) {
+            const detailBox = document.getElementById('lifecycle-detail');
+            const data = lifecycleSteps[stepId];
+            
+            // Highlight styling
+            document.querySelectorAll('.step-node').forEach(el => el.classList.remove('active-step'));
+            // Find the clicked element (in a real app we'd bind this better, but strict index works here)
+            document.querySelectorAll('.step-node')[stepId-1].classList.add('active-step');
+
+            detailBox.innerHTML = `
+                <h4 class="font-bold text-amber-800 text-lg mb-1">${data.title}</h4>
+                <p>${data.text}</p>
+            `;
+        }
+
+        function filterPrinciples() {
+            const input = document.getElementById('principleSearch').value.toLowerCase();
+            const listEl = document.getElementById('principlesList');
+            listEl.innerHTML = '';
+            
+            const filtered = principlesList.filter(p => p.title.toLowerCase().includes(input) || p.desc.toLowerCase().includes(input));
+            
+            filtered.forEach(p => {
+                const item = document.createElement('div');
+                item.className = 'p-3 hover:bg-stone-50 border-b border-stone-100 last:border-0';
+                item.innerHTML = `
+                    <div class="font-bold text-stone-700 text-sm">${p.title}</div>
+                    <div class="text-xs text-stone-500">${p.desc}</div>
+                `;
+                listEl.appendChild(item);
+            });
+            
+            if (filtered.length === 0) {
+                listEl.innerHTML = '<div class="p-3 text-stone-400 text-sm italic">No matching principles found.</div>';
+            }
+        }
+
+        // --- Initialization ---
+
+        window.onload = function() {
+            // 1. Radar Chart
+            const ctxRadar = document.getElementById('radarChart').getContext('2d');
+            const radarChart = new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: frameworkComponents.labels.map(splitLabel),
+                    datasets: [{
+                        label: 'Security Criticality',
+                        data: frameworkComponents.data,
+                        fill: true,
+                        backgroundColor: 'rgba(217, 119, 6, 0.2)', // Amber 600
+                        borderColor: '#D97706',
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#D97706',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#D97706'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#E7E5E4' },
+                            grid: { color: '#E7E5E4' },
+                            pointLabels: { font: { family: 'Inter', size: 11 }, color: '#57534E' },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            ticks: { display: false } // clean look
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: commonTooltip
+                    },
+                    onClick: (e) => {
+                        const points = radarChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true);
+                        if (points.length) {
+                            const index = points[0].index;
+                            const descContainer = document.getElementById('pillar-details');
+                            descContainer.innerHTML = `
+                                <h4 class="font-bold text-amber-700 text-xl mb-2">${frameworkComponents.labels[index]}</h4>
+                                <p class="text-stone-600 leading-relaxed">${frameworkComponents.descriptions[index]}</p>
+                            `;
+                            descContainer.classList.remove('justify-center', 'items-center', 'text-center');
+                        }
+                    }
+                }
+            });
+
+            // 2. Programming Security Bar Chart
+            const ctxBar = document.getElementById('programmingChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: progSecurityData.labels.map(splitLabel),
+                    datasets: [{
+                        label: 'Implementation Priority',
+                        data: progSecurityData.data,
+                        backgroundColor: '#14B8A6', // Teal 500
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            grid: { display: false },
+                            ticks: { font: { family: 'Inter' }, color: '#44403C' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: commonTooltip
+                    }
+                }
+            });
+
+            // 3. Audience Doughnut Chart
+            const ctxDoughnut = document.getElementById('audienceChart').getContext('2d');
+            new Chart(ctxDoughnut, {
+                type: 'doughnut',
+                data: {
+                    labels: audienceData.labels.map(splitLabel),
+                    datasets: [{
+                        data: audienceData.data,
+                        backgroundColor: ['#D97706', '#F59E0B', '#FCD34D', '#78350F'], // Ambers
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { size: 10 } } },
+                        tooltip: commonTooltip
+                    }
+                }
+            });
+
+            // Init Principles List
+            filterPrinciples();
+            // Init Flowchart Details with first step
+            showStepDetail(1);
+        };
+    </script>
+</body>
+</html>
