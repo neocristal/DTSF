@@ -1,0 +1,155 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 860" width="1180" height="860" font-family="Segoe UI, Inter, Helvetica, Arial, sans-serif" role="img" aria-label="DTSF v0.2.0 four-layer architecture diagram">
+  <defs>
+    <linearGradient id="hdr" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#16375e"/>
+      <stop offset="1" stop-color="#1f5fa9"/>
+    </linearGradient>
+    <style>
+      .card{fill:#ffffff;stroke:#c9d3df;stroke-width:1.2;rx:10}
+      .lyr{fill:#f4f7fa;stroke:#c9d3df;stroke-width:1.2}
+      .t{fill:#16375e;font-size:13px}
+      .tb{fill:#16375e;font-size:14px;font-weight:600}
+      .lbl{fill:#5a6a7d;font-size:11px;letter-spacing:.08em}
+      .sm{fill:#5a6a7d;font-size:11px}
+      .wht{fill:#ffffff}
+      .arw{stroke:#1f5fa9;stroke-width:2;fill:none;marker-end:url(#a)}
+    </style>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1f5fa9"/>
+    </marker>
+  </defs>
+
+  <rect width="1180" height="860" fill="#ffffff"/>
+
+  <!-- title bar -->
+  <rect x="0" y="0" width="1180" height="86" fill="url(#hdr)"/>
+  <text x="40" y="40" class="wht" font-size="25" font-weight="700">Data Transfer Security Framework v0.2.0 (alfa)</text>
+  <text x="40" y="66" fill="#b9d2f0" font-size="14">Quantum &amp; Multi-Domain — four-layer architecture</text>
+  <text x="1140" y="52" class="wht" font-size="13" text-anchor="end" opacity="0.85">github.com/neocristal/DTSF</text>
+
+  <!-- LAYER 1 -->
+  <rect x="40" y="112" width="1100" height="128" class="lyr" rx="10"/>
+  <rect x="40" y="112" width="6" height="128" fill="#1f5fa9" rx="3"/>
+  <text x="62" y="136" class="lbl">LAYER 1</text>
+  <text x="62" y="158" class="tb" font-size="16">Quantum-Safe Cryptographic Core</text>
+  <text x="62" y="178" class="sm">Mandatory baseline for every transfer — the cipher is usually fine, the key exchange is not</text>
+
+  <rect x="62" y="190" width="200" height="36" class="card"/>
+  <text x="76" y="207" class="tb">PQC baseline</text>
+  <text x="76" y="221" class="sm">ML-KEM · ML-DSA · SLH-DSA</text>
+
+  <rect x="274" y="190" width="188" height="36" class="card"/>
+  <text x="288" y="207" class="tb">Hybrid key exchange</text>
+  <text x="288" y="221" class="sm">X25519MLKEM768 · RFC 9370</text>
+
+  <rect x="474" y="190" width="170" height="36" class="card"/>
+  <text x="488" y="207" class="tb">Symmetric core</text>
+  <text x="488" y="221" class="sm">AES-256 · SHA-384</text>
+
+  <rect x="656" y="190" width="176" height="36" class="card"/>
+  <text x="670" y="207" class="tb">QKD — overlay only</text>
+  <text x="670" y="221" class="sm">never a substitute for PQC</text>
+
+  <rect x="844" y="190" width="130" height="36" class="card"/>
+  <text x="858" y="207" class="tb">QRNG</text>
+  <text x="858" y="221" class="sm">validated entropy</text>
+
+  <rect x="986" y="190" width="132" height="36" class="card"/>
+  <text x="1000" y="207" class="tb">Crypto-agility</text>
+  <text x="1000" y="221" class="sm">CBOM · fallback</text>
+
+  <path d="M590 244 L590 268" class="arw"/>
+
+  <!-- LAYER 2 -->
+  <rect x="40" y="274" width="1100" height="112" class="lyr" rx="10"/>
+  <rect x="40" y="274" width="6" height="112" fill="#2f7d5d" rx="3"/>
+  <text x="62" y="298" class="lbl">LAYER 2</text>
+  <text x="62" y="320" class="tb" font-size="16">Security Pillars — carried forward from v0.1.2, extended</text>
+
+  <g>
+    <rect x="62" y="334" width="140" height="34" class="card"/><text x="132" y="355" class="t" text-anchor="middle">1 Encryption</text>
+    <rect x="212" y="334" width="150" height="34" class="card"/><text x="287" y="355" class="t" text-anchor="middle">2 Secure Protocols</text>
+    <rect x="372" y="334" width="146" height="34" class="card"/><text x="445" y="355" class="t" text-anchor="middle">3 Authentication</text>
+    <rect x="528" y="334" width="146" height="34" class="card"/><text x="601" y="355" class="t" text-anchor="middle">4 Access Controls</text>
+    <rect x="684" y="334" width="140" height="34" class="card"/><text x="754" y="355" class="t" text-anchor="middle">5 Data Integrity</text>
+    <rect x="834" y="334" width="160" height="34" class="card"/><text x="914" y="355" class="t" text-anchor="middle">6 Logging &amp; Monitoring</text>
+    <rect x="1004" y="334" width="114" height="34" class="card"/><text x="1061" y="355" class="t" text-anchor="middle">7 Compliance</text>
+  </g>
+
+  <path d="M590 390 L590 414" class="arw"/>
+
+  <!-- LAYER 3 -->
+  <rect x="40" y="420" width="1100" height="212" class="lyr" rx="10"/>
+  <rect x="40" y="420" width="6" height="212" fill="#a4622a" rx="3"/>
+  <text x="62" y="444" class="lbl">LAYER 3 — NEW IN v0.2.0</text>
+  <text x="62" y="466" class="tb" font-size="16">Transport Domains — the profile is chosen by the physics of the link, not the sensitivity of the data</text>
+
+  <g>
+    <rect x="62" y="482" width="248" height="64" class="card"/>
+    <rect x="62" y="482" width="248" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="74" y="496" class="tb" font-size="11">TERRESTRIAL / CLOUD</text>
+    <text x="74" y="520" class="t">Profile Q-A · unconstrained</text>
+    <text x="74" y="538" class="sm">Hybrid PQC per session · TLS 1.3</text>
+
+    <rect x="322" y="482" width="248" height="64" class="card"/>
+    <rect x="322" y="482" width="248" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="334" y="496" class="tb" font-size="11">SPACE</text>
+    <text x="334" y="520" class="t">Profile Q-B / Q-C</text>
+    <text x="334" y="538" class="sm">CCSDS SDLS · BPSec · OTAR rekey</text>
+
+    <rect x="582" y="482" width="248" height="64" class="card"/>
+    <rect x="582" y="482" width="248" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="594" y="496" class="tb" font-size="11">AERONAUTICAL</text>
+    <text x="594" y="520" class="t">Profile Q-B · amortised</text>
+    <text x="594" y="538" class="sm">ARINC 823 · ground handshake, ratchet in air</text>
+
+    <rect x="842" y="482" width="276" height="64" class="card"/>
+    <rect x="842" y="482" width="276" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="854" y="496" class="tb" font-size="11">UNDERWATER — CABLE</text>
+    <text x="854" y="520" class="t">Profile Q-A · layered</text>
+    <text x="854" y="538" class="sm">L1 OTN + L2 MACsec + L4 TLS, split custody</text>
+
+    <rect x="62" y="556" width="248" height="64" class="card"/>
+    <rect x="62" y="556" width="248" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="74" y="570" class="tb" font-size="11">UNDERWATER — WIRELESS</text>
+    <text x="74" y="594" class="t">Profile Q-C · symmetric only</text>
+    <text x="74" y="612" class="sm">Ascon · KDF ratchet · courier rekey</text>
+
+    <rect x="322" y="556" width="248" height="64" class="card"/>
+    <rect x="322" y="556" width="248" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="334" y="570" class="tb" font-size="11">WIRELESS</text>
+    <text x="334" y="594" class="t">Profile Q-A / Q-C</text>
+    <text x="334" y="612" class="sm">PQ EAP-TLS · 5G SUCI · eSIM · LoRaWAN</text>
+
+    <rect x="582" y="556" width="248" height="64" class="card"/>
+    <rect x="582" y="556" width="248" height="20" fill="#e8f0f9" rx="10"/>
+    <text x="594" y="570" class="tb" font-size="11">STORAGE (DATA AT REST)</text>
+    <text x="594" y="594" class="t">PQ-wrapped KEK · per-record DEK</text>
+    <text x="594" y="612" class="sm">Crypto-erasure · renewal cycle</text>
+
+    <rect x="842" y="556" width="276" height="64" fill="#fff8ee" stroke="#e0c9a6" stroke-width="1.2" rx="10"/>
+    <text x="854" y="576" class="tb" font-size="11">HARVEST NOW, DECRYPT LATER</text>
+    <text x="854" y="596" class="sm">Broadcast and tappable links + long data</text>
+    <text x="854" y="612" class="sm">lifetimes = exposure that already exists</text>
+  </g>
+
+  <path d="M590 636 L590 660" class="arw"/>
+
+  <!-- LAYER 4 -->
+  <rect x="40" y="666" width="1100" height="112" class="lyr" rx="10"/>
+  <rect x="40" y="666" width="6" height="112" fill="#6b4c9a" rx="3"/>
+  <text x="62" y="690" class="lbl">LAYER 4</text>
+  <text x="62" y="712" class="tb" font-size="16">Governance &amp; Emerging Technology</text>
+
+  <g>
+    <rect x="62" y="726" width="188" height="34" class="card"/><text x="156" y="747" class="t" text-anchor="middle">Zero Trust</text>
+    <rect x="260" y="726" width="230" height="34" class="card"/><text x="375" y="747" class="t" text-anchor="middle">GDPR · EU-U.S. DPF</text>
+    <rect x="500" y="726" width="230" height="34" class="card"/><text x="615" y="747" class="t" text-anchor="middle">DLT &amp; digital identity</text>
+    <rect x="740" y="726" width="200" height="34" class="card"/><text x="840" y="747" class="t" text-anchor="middle">AI &amp; autonomous agents</text>
+    <rect x="950" y="726" width="168" height="34" class="card"/><text x="1034" y="747" class="t" text-anchor="middle">PQ migration roadmap</text>
+  </g>
+
+  <text x="40" y="806" class="sm">Profile Q-A: full hybrid PQC handshake per session   ·   Profile Q-B: handshake off-link, symmetric KDF ratchet on-link   ·   Profile Q-C: no asymmetric crypto on the link at all</text>
+  <text x="40" y="826" class="sm">Permanent core: a 256-bit symmetric key is protected by thermodynamics — Grover leaves 2^128 work, which no physically realisable energy budget can perform.</text>
+  <text x="40" y="846" class="sm">DTSF v0.2.0 (alfa) — August 2026 · alpha guidance for review, not a certification standard and not legal advice.</text>
+</svg>

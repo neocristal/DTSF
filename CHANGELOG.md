@@ -56,11 +56,26 @@ All notable changes to the Data Transfer Security Framework are documented here.
 | Storage keys | Not specified | **PQ-wrapped KEK; per-record DEK** |
 | Machine/agent identity | Not addressed | **Mandatory, distinct, attenuated, short-lived** |
 
+### Regenerated assets
+
+* **`diagram-dtsf-v0.2.0.svg`** — new vector architecture diagram (four layers, seven domains, three profiles), referenced by the README, the infographic and the explorer. Self-contained, no external fonts or assets.
+* **`index.html`** — rebuilt as the v0.2.0 infographic. Fully self-contained (no CDN scripts, no external stylesheets), responsive, light/dark aware.
+* **`index_page.html`** — rebuilt as the v0.2.0 interactive explorer: tabbed navigation, a per-domain detail browser, a filterable algorithm reference, and a searchable catalogue of all 110 controls. Vanilla JavaScript only; the Tailwind and Chart.js CDN dependencies were removed.
+* **`DTSF Methodology Development.docx`** — regenerated from the updated Markdown source, including the v0.2.0 chapters, the extended works-cited list and a cover page.
+
+### Security housekeeping
+
+* The v0.1.2 `index.html` contained an embedded Firebase service-account JWT and project configuration. The file was removed and **the repository history was rewritten** to purge the credential from every commit, followed by a force-push. Anyone holding an older clone must re-clone. The associated credential should be treated as exposed and rotated regardless of the rewrite, since it was publicly available before removal.
+
 ### Notes
 
 * The version number moves **0.1.2 → 0.2.0** rather than 0.1.3 because this release adds new domains and changes baseline requirements; it is not a patch.
-* `DTSF Methodology Development.docx`, `DTSF Methodology Development 2026.jpeg`, `diagram-dstf.jpg`, `index.html` and `index_page.html` still reflect v0.1.2 and are scheduled for regeneration.
+* `DTSF Methodology Development 2026.jpeg` and `diagram-dstf.jpg` still depict v0.1.2 and are superseded by `diagram-dtsf-v0.2.0.svg`.
 * This remains an **alpha** release: guidance for review and comment, not a certification standard, and not legal advice.
+
+### Contributors
+
+Developed by CYBORA LLC (US), CYBORA UAB (LT), EnGarde Games Ltd (UK), EnGarde Games MB (LT), IKANDU VšĮ (NVO, LT) and Network Gate (US–LT).
 
 ---
 

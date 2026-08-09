@@ -79,7 +79,11 @@ A Data Transfer Security Framework provides guidelines, protocols, and best prac
 
 **10. Machine Governance (new):** Autonomous systems that initiate transfers act under scoped, attributable, revocable machine identities.
 
-![Data Security Transfer Framework](https://github.com/neocristal/DSTF/blob/main/diagram-dstf.jpg?raw=true)
+![DTSF v0.2.0 four-layer architecture](diagram-dtsf-v0.2.0.svg)
+
+*The v0.2.0 architecture. See [diagram.md](/diagram.md) for the profile-selection flow, the key hierarchy, the layered
+transatlantic transfer, and the lifecycle view. An [infographic](index.html) and an
+[interactive explorer](index_page.html) are also included in the repository.*
 
 ---
 
@@ -149,6 +153,24 @@ A Data Transfer Security Framework provides guidelines, protocols, and best prac
 5. **Secure Transfer** — apply the domain profile (Q-A / Q-B / Q-C) and layer independent protections.
 6. **Secure Storage** — AES-256 at rest under PQ-wrapped keys, per-record DEKs, WORM copies, renewal cycle.
 7. **Disposal** — crypto-erasure with auditable destruction evidence.
+
+---
+
+## Contributing Organizations
+
+DTSF is developed collaboratively by the following organizations:
+
+| Organization | Jurisdiction | Type |
+|--------------|--------------|------|
+| **CYBORA LLC** | United States | Cybersecurity |
+| **CYBORA UAB** | Lithuania | Cybersecurity |
+| **EnGarde Games Ltd** | United Kingdom | Technology |
+| **EnGarde Games MB** | Lithuania | Technology |
+| **IKANDU VšĮ** | Lithuania | Non-governmental organization (NVO) |
+| **Network Gate** | United States – Lithuania | Technology |
+
+The framework is a transatlantic effort by design: its authors operate under both EU and U.S. law, which is the same
+regulatory boundary the framework itself is written to cross.
 
 ---
 
