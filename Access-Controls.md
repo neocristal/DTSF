@@ -173,3 +173,80 @@ Access control for healthcare institutions is of paramount importance to safegua
    - Provide comprehensive training and awareness programs to healthcare staff on access control policies, procedures, and best practices. Educate employees about the importance of protecting patient privacy, maintaining confidentiality, and adhering to security protocols.
 
 By implementing robust access control measures tailored to the specific needs and regulatory requirements of healthcare institutions, organizations can effectively protect patient data, prevent unauthorized access, and maintain compliance with privacy and security standards.
+
+---
+
+# Access control in DTSF v0.2.0
+
+Version 0.2.0 extends access control in four directions. The classical models above (RBAC, ABAC, least privilege, logging) remain the foundation; what follows addresses the cases they do not reach.
+
+## 1. Key custody as an access-control mechanism
+
+In every new DTSF domain, the decisive access decision is not "who may log in" but **who holds the key**. A cloud provider, a carrier, a satellite operator or a foreign authority that can obtain plaintext has effective access regardless of any permission model.
+
+| Requirement | Detail |
+|-------------|--------|
+| **Independent custody** | For regulated personal data traversing a third party or third country, at least one encryption layer must use keys the third party cannot access |
+| **Split knowledge and dual control** | No single person can reconstruct a root key; applies to HSM ceremonies, pre-launch injection and courier rekeying |
+| **Jurisdiction-scoped keys** | A domain key per jurisdiction makes data residency enforceable by key policy rather than by data location alone |
+| **Documented key-release procedure** | Lawful access, legal hold and emergency recovery must be auditable and dual-controlled — an undocumented path is an undocumented backdoor |
+| **Destruction evidence** | Key destruction (crypto-erasure) requires an auditable record naming key, time, operator and authorisation |
+| **Custody inventory** | Every key in the Cryptographic Bill of Materials has a named owner and a named custodian |
+
+See [Storage-Security.md](/Storage-Security.md) and [Quantum-Encryption-Protocols.md](/Quantum-Encryption-Protocols.md).
+
+## 2. Domain-boundary access control
+
+Where a network boundary separates safety, control and untrusted zones, access control must be enforced by mechanisms that cannot be reconfigured by a compromised application.
+
+| Boundary | Enforcement |
+|----------|-------------|
+| Aircraft: passenger/IFE domains → Aircraft Control Domain | **No path.** Enforced by a data diode or approved gateway module, never by software policy alone ([Domain-Aeronautical.md](/Domain-Aeronautical.md)) |
+| Spacecraft: telecommand authority | Authenticated command path with no unauthenticated safe-mode fallback; ground segment micro-segmented ([Domain-Space.md](/Domain-Space.md)) |
+| Subsea: management plane → data plane | Physically and logically separated; MFA and PQ-protected administration ([Domain-Underwater.md](/Domain-Underwater.md)) |
+| Wireless: guest/BYOD → operational networks | Full isolation; no shared VLAN, no shared identity store ([Wireless-Security.md](/Wireless-Security.md)) |
+| Storage: tenant and jurisdiction isolation | Enforced by key partitioning, not only by metadata filters |
+
+## 3. Machine and agent identity
+
+Autonomous systems now initiate transfers. Access control that assumes a human principal fails silently in that case.
+
+1. **Every agent has its own identity** — SPIFFE/SVID, workload identity or mTLS client certificate; one per agent instance and purpose.
+2. **No agent uses a human's credentials** and no static API keys are issued.
+3. **Attenuated delegation** — the agent receives a strict subset of the delegating user's rights, scoped by purpose and time (RFC 8693 token exchange).
+4. **On-behalf-of provenance** on every downstream call: this agent, for this user, under this authorisation, at this time. Without it, a data subject access request cannot be answered.
+5. **Capability scoping in the tool and IAM layers** — never in a prompt or system message.
+6. **Independent revocation** of agent and user access.
+7. **Approval gates** for irreversible actions and for any cross-border transfer of personal data.
+
+See [AI-Machine-Integration.md](/AI-Machine-Integration.md).
+
+## 4. Cross-border access and public-authority requests
+
+The Data Privacy Framework supplemental principle on Access Requests by Public Authorities, and the *Schrems II* reasoning behind it, make government access an access-control problem rather than only a legal one.
+
+| Control | Purpose |
+|---------|---------|
+| Transparency reporting of public-authority requests | Evidence for data subjects and supervisory authorities |
+| Legal review before any disclosure | Ensures the request is valid in the responding jurisdiction |
+| Data-owner key custody | A provider cannot disclose plaintext it cannot decrypt |
+| Minimised and segregated data | Limits the scope of any lawful request |
+| Notification where legally permitted | Preserves the data subject's right to redress |
+| Documented in the transfer impact assessment | Demonstrates the "essentially equivalent" protection the DPF requires |
+
+## 5. Access-control matrix summary
+
+| ID | Control | Priority |
+|----|---------|----------|
+| AC-01 | Least privilege and RBAC/ABAC across all systems | Mandatory |
+| AC-02 | MFA on all privileged and remote access, with phishing-resistant factors | Mandatory |
+| AC-03 | Independent key custody for third-party and third-country processing | Mandatory |
+| AC-04 | Split knowledge and dual control for root key operations | Mandatory |
+| AC-05 | Hardware-enforced domain boundaries where safety or control is at stake | Mandatory |
+| AC-06 | Distinct, short-lived, attenuated machine identities for all agents | Mandatory |
+| AC-07 | On-behalf-of provenance recorded for machine-initiated transfers | Mandatory |
+| AC-08 | Documented, auditable, dual-controlled key-release and lawful-access procedure | Mandatory |
+| AC-09 | Access reviews at a defined cadence, including machine identities | Mandatory |
+| AC-10 | Continuous verification (Zero Trust) rather than session-establishment trust | Mandatory |
+| AC-11 | Jurisdiction-scoped domain keys for residency enforcement | Recommended |
+| AC-12 | Transparency reporting for public-authority access requests | Recommended |

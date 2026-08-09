@@ -1,10 +1,19 @@
 # The Data Transfer Security Framework and the Transatlantic Architecture of Digital Privacy
 
+> **Version:** DTSF **v0.2.0 (alfa)** — "Quantum & Multi-Domain", August 2026.
+> Supersedes v0.1.2 (January 2026). Chapters 1–8 describe the classical
+> foundation carried forward from v0.1.2; chapters 9–13 are new in v0.2.0
+> and introduce the quantum-safe cryptographic core, the space, aeronautical,
+> underwater, wireless and storage domains, and the governance of distributed
+> ledgers and autonomous machine systems.
+> See [CHANGELOG.md](/CHANGELOG.md) for the full list of changes and
+> [README.md](/README.md) for the document index.
+
 The digital global economy is underpinned by the continuous, high-speed
 exchange of data across international borders. As these flows grow in
 volume and complexity, the necessity for a standardized approach to
 securing this information becomes paramount. The Data Transfer Security
-Framework (DTSF) v0.1.2 (alfa) represents a significant evolutionary
+Framework (DTSF) represents a significant evolutionary
 step in this domain, providing a comprehensive set of protocols,
 standards, and organizational practices designed to ensure the secure
 transmission of data between systems and across disparate networks.^1^
@@ -498,22 +507,331 @@ themselves.^35^
 | Panel Structure         | One or three independent arbitrators          | Impartial and fair adjudication        |
 | Pre-requisite           | Attempt to resolve with org and DPA first     | Exhaustion of simpler remedies         |
 
+## The Quantum Foundation of DTSF v0.2.0
+
+The v0.1.2 framework identified post-quantum cryptography as a future
+requirement. v0.2.0 makes it the foundation, because the threat is no
+longer prospective: the interception is happening now, and only the
+decryption is deferred.
+
+### From Prospective Threat to Present Exposure
+
+A cryptographically relevant quantum computer (CRQC) affects the two
+halves of the cryptographic estate asymmetrically. Shor\'s algorithm
+solves factorization and discrete logarithms in polynomial time, which
+destroys RSA, Diffie-Hellman, ECDH, ECDSA and EdDSA outright. Grover\'s
+algorithm provides only a quadratic speed-up against symmetric
+primitives, which is answered by doubling key and digest lengths.^38^ The
+practical conclusion is that symmetric cryptography requires a parameter
+change while asymmetric cryptography requires replacement.
+
+The operative risk is **Harvest Now, Decrypt Later**. An adversary who
+records ciphertext today — from a subsea cable, a satellite downlink, a
+radio link or a wireless beam — can store it indefinitely and decrypt it
+once a CRQC exists. Any data whose sensitivity outlives the arrival of
+that machine is, in practical terms, already exposed. Mosca\'s
+inequality (`X + Y > Z`, where X is the required secrecy lifetime, Y the
+migration duration and Z the time until a CRQC) shows that clinical trial
+records, health data, land registries, defence imagery and long-mission
+spacecraft telemetry are past the threshold today.^39^
+
+### The Standardized Post-Quantum Baseline
+
+The framework adopts the finalized NIST standards as its baseline: ML-KEM
+(FIPS 203) for key encapsulation, ML-DSA (FIPS 204) for digital
+signatures, and SLH-DSA (FIPS 205) as the conservative hash-based
+alternative, complemented by FN-DSA for size-constrained signatures, HQC
+as an algorithmically diverse backup key-encapsulation mechanism, the
+stateful hash-based schemes of SP 800-208 for firmware signing, and the
+Ascon family of SP 800-232 for constrained devices.^40^ ^41^ ^42^
+
+Because ML-KEM and ML-DSA are both lattice-based, a structural break in
+lattice assumptions would remove both simultaneously. DTSF v0.2.0
+therefore requires a documented and *exercised* fallback to code-based
+and hash-based alternatives. Crypto-agility is elevated from an
+aspiration to a mandatory control, evidenced by a Cryptographic Bill of
+Materials, size-independent data structures, and an authenticated remote
+rekey path on every deployed device.
+
+### Hybrid Transition and the Role of Quantum Key Distribution
+
+Throughout the transition period the framework requires **hybrid** key
+establishment, combining a classical and a post-quantum exchange so that
+the session secret is secure if either component holds. This is the
+position of the German and French national authorities, and it protects
+against both a quantum break of elliptic curves and an undiscovered
+classical break of a young lattice scheme.^43^
+
+Quantum Key Distribution occupies a deliberately narrow position. QKD
+distributes keys using physical principles, and the no-cloning theorem
+makes interception detectable — but the same theorem forbids
+amplification, which means QKD cannot traverse a repeatered transoceanic
+cable. QKD also provides no authentication of its own and therefore
+depends on post-quantum or pre-shared authentication rather than
+replacing it. The framework treats QKD as an optional defence-in-depth
+overlay for metropolitan fibre, national quantum backbones such as
+EuroQCI, and satellite links, always combined with a post-quantum key
+through a key-derivation function so that a flawed vendor implementation
+cannot compromise the result.^44^ Quantum random number generation is
+treated separately again, as a validated entropy source rather than a
+protocol.
+
+Full technical detail is provided in
+[Quantum-Encryption-Protocols.md](/Quantum-Encryption-Protocols.md), and
+the organizational transition in
+[PQC-Migration-Roadmap.md](/PQC-Migration-Roadmap.md).
+
+## The Multi-Domain Architecture
+
+The most consequential structural change in v0.2.0 is the recognition
+that the applicable security profile is determined by the **physics of
+the link**, not by the sensitivity of the data. A framework written for
+terrestrial IP networks cannot be applied unchanged to a spacecraft
+telecommand uplink, an aeronautical datalink shared across an entire
+coverage volume, or an acoustic modem operating at eighty bits per
+second.
+
+### Three Cryptographic Profiles
+
+DTSF v0.2.0 defines three profiles. **Profile Q-A (unconstrained)**
+performs full hybrid post-quantum handshakes per session and applies to
+terrestrial networks, cloud infrastructure, subsea cable systems,
+broadband satellite links and ground segments. **Profile Q-B
+(amortised)** performs the asymmetric handshake rarely — on the ground,
+or over a broadband side channel — and derives many short-lived session
+keys from the resulting secret through a one-way ratchet; it applies to
+narrowband aeronautical datalinks and routine spacecraft operations.
+**Profile Q-C (symmetric-only)** performs no asymmetric operation over
+the link at all, relying on physically injected 256-bit root keys, a
+key-derivation ratchet for forward secrecy, and authenticated encryption
+sized for the channel; it applies to underwater acoustic networks, deep
+space, and legacy embedded systems.
+
+Profile Q-C is quantum-safe by construction, because symmetric
+cryptography at 256 bits requires no post-quantum replacement. Its cost
+is that the entire security burden moves to key custody and rotation
+logistics, which must then be governed as a first-class control.
+
+### The Space Domain
+
+Space combines the two worst properties for confidentiality: downlinks
+are broadcast and therefore interceptable by anyone with a dish, and
+missions last fifteen to twenty-five years without hardware refresh.
+Link-layer protection is provided by the CCSDS Space Data Link Security
+protocol with AES-256 in Galois/Counter Mode, complemented by the
+Extended Procedures for on-orbit key management, and by BPSec over
+Bundle Protocol version 7 for end-to-end protection that survives
+store-and-forward relaying.^45^ ^46^ Because a telecommand frame is at
+most 1 024 octets, post-quantum signatures must authorize command
+*batches* and software loads rather than individual commands, while
+per-frame authenticity is provided symmetrically. The long-term trust
+anchor for on-board software is hash-based, since it must remain
+credible for the whole mission. Satellite quantum key distribution — the
+Micius heritage, ESA\'s EAGLE-1, EuroQCI and the IRIS² security segment —
+is the only physically realisable route to intercontinental QKD, and is
+detailed in [Domain-Space.md](/Domain-Space.md).
+
+### The Aeronautical Domain
+
+Aviation is the only domain in which a security control can cause harm by
+functioning correctly at the wrong moment. The framework therefore
+requires that no control in the Aircraft Control Domain may deny a
+safety-of-life function, and that the domain separation of ARINC 664
+Part 5 — control, information services, passenger entertainment and
+passenger-owned devices — be enforced by devices that are not
+general-purpose software.
+
+The operative constraint is bandwidth. A single ML-DSA-65 signature of
+3 309 bytes consumes roughly the airtime of fifteen typical ACARS
+messages on a 31.5 kbit/s channel shared across an entire coverage
+volume. Naïve per-message post-quantum signing would collapse the
+datalink. The answer is Profile Q-B: establish the root secret on the
+ground or over broadband satellite, ratchet it symmetrically in the air,
+authenticate messages with short symmetric tags, and reserve
+post-quantum signatures for trust boundaries such as loadable software
+parts and key provisioning bundles.^47^ Aviation also carries substantial
+personal data — passenger name records, crew rostering and licensing
+data, cabin connectivity logs — across jurisdictions continuously, which
+places it squarely within the Data Privacy Framework principles on
+onward transfer and human resources data.
+
+### The Underwater Domain
+
+Approximately ninety-nine percent of intercontinental internet traffic —
+including the transatlantic flows this framework was written to protect —
+travels through subsea fibre optic cables. The threats are physical
+tapping (realistically at landing stations rather than mid-ocean),
+sabotage and cable cutting, compromise of the management plane, and bulk
+recording for future decryption. The framework requires at least two
+independent encryption layers with **independent key custody**: Layer-1
+optical or OTN encryption under carrier custody protects everything
+including control traffic at line rate, while application-layer hybrid
+post-quantum TLS under the data owner\'s custody provides the end-to-end
+guarantee that a provider-terminated layer cannot. This layered
+arrangement, together with route and landing diversity, is the concrete
+supplementary measure that makes a transatlantic transfer defensible
+under the reasoning of *Schrems II*, and post-quantum key establishment
+extends that defence past the arrival of a CRQC.^48^
+
+Underwater *wireless* is a different world governed by acoustics: radio
+does not propagate in seawater, sound travels at 1 500 metres per second
+giving 0.67 seconds of latency per kilometre, and practical data rates
+range from eighty bits per second to a few kilobits. A single ML-KEM
+ciphertext would occupy such a channel for up to two minutes. Profile Q-C
+therefore applies, with physically injected keys, a key-derivation
+ratchet, Ascon-based authenticated encryption, loss-tolerant replay
+protection, and scheduled rekeying by courier or autonomous vehicle. A
+vehicle that collects data and surfaces to transmit is architecturally a
+delay-tolerant network — identical to a deep space probe — and the
+framework deliberately defines a single DTN security profile serving
+both domains. See [Domain-Underwater.md](/Domain-Underwater.md).
+
+### Wireless and Storage as First-Class Domains
+
+Two further domains are added because they are where Harvest Now, Decrypt
+Later is actually realised. Every wireless transmission is a
+publication, capturable with inexpensive software-defined radio and no
+detectable trace; the migration priority is therefore ordered by the
+recoverable value per captured byte, beginning with enterprise 802.1X
+authentication, virtual private networks, 5G subscriber identity
+concealment and remote SIM provisioning. Wireless identifiers are
+themselves personal data, and emerging sensing capabilities in Wi-Fi and
+sixth-generation networks turn access points into motion and health
+sensors, which the framework classifies accordingly.
+
+Storage is treated as data in transit that has stopped. Its risk driver
+is the retention period rather than the sensitivity label, and its
+central quantum problem is not the disk cipher — AES-256 is already
+sufficient — but the fact that data encryption keys were transported
+under classical asymmetric wrapping. Re-encrypting long-retention
+archives under post-quantum-wrapped keys is the largest and most
+frequently omitted task of the migration. Per-record data encryption
+keys additionally make **crypto-erasure** possible, which is the only
+practical mechanism for satisfying the right to erasure across
+replicated cloud storage, immutable media and tape archives. See
+[Wireless-Security.md](/Wireless-Security.md) and
+[Storage-Security.md](/Storage-Security.md).
+
+## Governance of Emerging Technologies
+
+### Distributed Ledgers in Government and Society
+
+The framework treats distributed ledger technology as a narrow tool for
+verifiable integrity among mutually distrusting parties, not as a
+general database and not as a privacy technology. Where multiple
+independent institutions must agree on an append-only history that none
+can silently rewrite, a permissioned Byzantine-fault-tolerant ledger with
+a named and legally accountable validator set is appropriate; where they
+do not, a signed and replicated audit log with trusted timestamping
+achieves the same assurance at a fraction of the cost.
+
+The decisive constraint is legal rather than technical. Immutability
+conflicts directly with the rights to erasure and rectification, and
+replication to nodes in third countries constitutes an international
+transfer. The framework therefore adopts a normative rule: no personal
+data, no linkable pseudonymous identifier and no biometric template may
+be written to any ledger replicated beyond the controller\'s legal
+control — only salted commitments, with the salt held off-chain and
+destructible. Ledgers are also uniquely exposed to quantum attack,
+because their signatures are permanent and their public keys are
+published forever; consequently any conformant ledger requires
+post-quantum signatures from inception, a protocol-level algorithm
+upgrade path, and long-term validation evidence so that records signed
+today remain verifiable decades hence.^49^
+
+The most valuable public-sector application is not a government
+blockchain but decentralised digital identity, in which verifiable
+credentials are held by the citizen, selective disclosure proves
+predicates without revealing attributes, and the ledger publishes issuer
+keys and revocation status only. The requirements of unlinkability,
+absence of issuer phone-home, offline verifiability and a non-digital
+equivalent for citizens who cannot use the digital route are design
+obligations rather than social afterthoughts. See
+[Blockchain-Governance.md](/Blockchain-Governance.md).
+
+### Artificial Intelligence and Autonomous Agents
+
+DTSF v0.1.2 assumed that data is moved by systems, on behalf of people,
+according to code written by people. All three assumptions have weakened.
+Autonomous agents now initiate transfers at runtime without a human in
+the loop; a growing proportion of code is machine-generated; and a prompt
+submitted to a model is itself a data transfer, potentially an
+international one, on every call.
+
+The framework accordingly introduces a fourth actor class — the
+autonomous agent — and one architectural requirement above all others:
+an agent must possess its own identity, with short-lived and attenuated
+credentials scoped to a stated purpose, and must never act using a
+human\'s credentials. The Data Privacy Framework principles of Notice,
+Choice, Purpose Limitation and Accountability for Onward Transfer are
+defined in terms of who processes data for what purpose; an agent
+operating under a shared service account destroys the evidentiary basis
+those principles require.
+
+Prompt injection is treated as a structural vulnerability rather than a
+defect awaiting a patch, since language models do not reliably separate
+instructions from data. The mitigations are architectural: capability
+scoping enforced in the tool and identity layers rather than in prompts,
+separation of agents that read untrusted content from agents that hold
+privileged credentials, treating every model output as untrusted input,
+egress restriction, human approval gates for irreversible actions, and
+blast-radius limits. Retrieval-augmented generation requires
+permission-aware retrieval filtered for the requesting user at query
+time, and embeddings must be classified at the classification of their
+source data because they can be inverted. Machine-generated code
+implementing cryptography, authentication or authorization requires
+review by a named human expert, and dependency allow-listing is required
+to defeat attacks on hallucinated package names.^50^ See
+[AI-Machine-Integration.md](/AI-Machine-Integration.md).
+
 ## Future Outlook: Resilience and Emerging Challenges
 
-The Data Transfer Security Framework v0.1.2 is a dynamic entity,
+The Data Transfer Security Framework is a dynamic entity,
 designed to adapt as new threats and technologies emerge. However, the
 future of transatlantic data flows remains subject to both technological
 and legal challenges.
 
-### Technological Threats and Quantum Readiness
+### The Limits of Nature and the Boundary of Speculation
 
-The increasing power of quantum computing represents a long-term threat
-to current cryptographic standards. Many of the algorithms used for
-asymmetric encryption, such as RSA, could potentially be cracked by a
-sufficiently powerful quantum computer. The next iterations of the DTSF
-will likely need to incorporate post-quantum cryptography (PQC) to
-ensure the continued confidentiality of data transfers in the decades to
-come.^10^
+A framework that extends into space, quantum physics and autonomous
+systems must state plainly where engineering ends. v0.2.0 introduces an
+explicit credibility scale separating what physical law forbids from what
+engineering has not yet achieved, and both from claims that are simply
+unfounded.^51^
+
+Several physical limits are permanent design constraints. Relativistic
+latency makes interactive handshakes impossible beyond certain
+distances, which is why delay-tolerant networking with pre-shared keys is
+a necessity rather than a preference in deep space and underwater. The
+no-cloning theorem simultaneously grants QKD its eavesdropping detection
+and forbids the optical amplification that transoceanic cables require.
+Most importantly, Landauer\'s principle places a thermodynamic floor
+beneath the energy cost of computation, which means that exhaustive
+search of a 256-bit key space — even reduced quadratically by Grover\'s
+algorithm — remains outside any physically realisable energy budget.
+Symmetric cryptography at 256 bits is therefore a permanent solution, not
+a transitional one, and this is precisely why the constrained profiles of
+the space, aeronautical and underwater domains resolve to symmetric
+designs.
+
+Genuine open questions remain, and the framework tracks rather than plans
+around them: quantum repeaters that would make QKD routable, practical
+fully homomorphic encryption that would transform the legal analysis of
+cross-border processing, physical-layer key generation that would resolve
+the rekeying logistics of constrained networks, and the binding of
+cryptographic operations to a gravitationally measured physical location
+as an unspoofable alternative to satellite navigation. Equally, the
+framework states which claims to reject: gravitational-wave
+communication and faster-than-light signalling through entanglement are
+not engineering challenges but violations of established physics, and
+naming them as such protects organizations from a form of procurement
+fraud considerably more common than any exotic attack described in this
+document. General relativity nevertheless already participates in
+security engineering in a mundane way — the thirty-eight microseconds per
+day of net time dilation at navigation-satellite altitudes underlies
+every timestamp on which certificate validity, replay windows and
+forensic correlation depend. See
+[Research-Horizons.md](/Research-Horizons.md).
 
 ### Persistent Legal and Geopolitical Volatility
 
@@ -534,12 +852,38 @@ data transfer security.
 
 ## Conclusions and Strategic Recommendations
 
-The analysis of the Data Transfer Security Framework v0.1.2 reveals a
+The analysis of the Data Transfer Security Framework v0.2.0 reveals a
 comprehensive and highly integrated approach to the problem of securing
 data in transit. By combining the technical rigor of Zero Trust and
 modern cryptography with the administrative protections of the Data
 Privacy Framework, it provides a viable path forward for organizations
 navigating the complexities of global digital commerce.
+
+The distinguishing recommendation of this version is one of sequencing.
+Post-quantum migration is not primarily a cryptography project but an
+inventory and dependency project with a cryptographic conclusion:
+organizations fail at it because they never establish where their
+cryptography lives, not because they select the wrong algorithm.
+Discovery typically consumes forty percent of the total effort, and
+until a Cryptographic Bill of Materials exists the migration can be
+neither scoped nor evidenced to a supervisory authority. Assets with
+long field lives — spacecraft, avionics, subsea plant, metering and
+medical devices, and archives with statutory retention — must be
+addressed first precisely because they finish last, and every system
+procured today without a post-quantum capability or a signed remote
+update path extends the migration by its entire service life.
+
+Three further conclusions follow from the multi-domain analysis. First,
+the physics of the link, not the sensitivity of the data, determines the
+achievable security architecture, and a framework that ignores this will
+be quietly disregarded by the engineers who operate constrained links.
+Second, independent key custody across layered encryption is the concrete
+technical measure that makes an international transfer defensible, on a
+subsea cable and in third-country storage alike. Third, the durable core
+of the framework is unglamorous: a 256-bit symmetric key, protected by
+thermodynamics, delivered to the right place, used under an attributable
+identity, and replaceable when something breaks. Every other control in
+this document exists to serve that sentence.
 
 The primary recommendation for organizations is to move away from a
 fragmented approach to security and instead adopt a unified framework
@@ -705,3 +1049,61 @@ customers.
 
 37. ISO27001 - GRC Solutions, accessed January 11, 2026,
     > [[https://grcsolutions.io/iso27001/]{.underline}](https://grcsolutions.io/iso27001/)
+
+#### Works cited — additions for v0.2.0
+
+38. NIST IR 8547, Transition to Post-Quantum Cryptography Standards,
+    > accessed August 9, 2026,
+    > [[https://csrc.nist.gov/pubs/ir/8547/ipd]{.underline}](https://csrc.nist.gov/pubs/ir/8547/ipd)
+
+39. M. Mosca, Cybersecurity in an Era with Quantum Computers: Will We Be
+    > Ready?, IEEE Security & Privacy, accessed August 9, 2026,
+    > [[https://eprint.iacr.org/2015/1075]{.underline}](https://eprint.iacr.org/2015/1075)
+
+40. FIPS 203, Module-Lattice-Based Key-Encapsulation Mechanism Standard,
+    > accessed August 9, 2026,
+    > [[https://csrc.nist.gov/pubs/fips/203/final]{.underline}](https://csrc.nist.gov/pubs/fips/203/final)
+
+41. FIPS 204, Module-Lattice-Based Digital Signature Standard, accessed
+    > August 9, 2026,
+    > [[https://csrc.nist.gov/pubs/fips/204/final]{.underline}](https://csrc.nist.gov/pubs/fips/204/final)
+
+42. FIPS 205, Stateless Hash-Based Digital Signature Standard, accessed
+    > August 9, 2026,
+    > [[https://csrc.nist.gov/pubs/fips/205/final]{.underline}](https://csrc.nist.gov/pubs/fips/205/final)
+
+43. NIS Cooperation Group, Coordinated Implementation Roadmap for the
+    > Transition to Post-Quantum Cryptography, accessed August 9, 2026,
+    > [[https://digital-strategy.ec.europa.eu/en/library/coordinated-implementation-roadmap-transition-post-quantum-cryptography]{.underline}](https://digital-strategy.ec.europa.eu/en/library/coordinated-implementation-roadmap-transition-post-quantum-cryptography)
+
+44. ETSI GS QKD 014, Quantum Key Distribution - Protocol and data format
+    > of REST-based key delivery API, accessed August 9, 2026,
+    > [[https://www.etsi.org/committee/qkd]{.underline}](https://www.etsi.org/committee/qkd)
+
+45. CCSDS 355.0-B, Space Data Link Security Protocol, accessed August 9,
+    > 2026,
+    > [[https://public.ccsds.org/Pubs/355x0b2.pdf]{.underline}](https://public.ccsds.org/Pubs/355x0b2.pdf)
+
+46. RFC 9172, Bundle Protocol Security (BPSec), accessed August 9, 2026,
+    > [[https://www.rfc-editor.org/rfc/rfc9172.html]{.underline}](https://www.rfc-editor.org/rfc/rfc9172.html)
+
+47. ARINC 823, Data Link Security Part 1 - ACARS Message Security,
+    > accessed August 9, 2026,
+    > [[https://aviation-ia.sae-itc.com/standards]{.underline}](https://aviation-ia.sae-itc.com/standards)
+
+48. European Commission, EU Action Plan on Cable Security, accessed
+    > August 9, 2026,
+    > [[https://digital-strategy.ec.europa.eu/en/policies/cable-security]{.underline}](https://digital-strategy.ec.europa.eu/en/policies/cable-security)
+
+49. Regulation (EU) 2024/1183 (eIDAS 2.0) establishing the European
+    > Digital Identity Framework, accessed August 9, 2026,
+    > [[https://eur-lex.europa.eu/eli/reg/2024/1183/oj]{.underline}](https://eur-lex.europa.eu/eli/reg/2024/1183/oj)
+
+50. Regulation (EU) 2024/1689 laying down harmonised rules on artificial
+    > intelligence (AI Act), accessed August 9, 2026,
+    > [[https://eur-lex.europa.eu/eli/reg/2024/1689/oj]{.underline}](https://eur-lex.europa.eu/eli/reg/2024/1689/oj)
+
+51. R. Landauer, Irreversibility and Heat Generation in the Computing
+    > Process, IBM Journal of Research and Development, accessed August 9,
+    > 2026,
+    > [[https://ieeexplore.ieee.org/document/5392446]{.underline}](https://ieeexplore.ieee.org/document/5392446)

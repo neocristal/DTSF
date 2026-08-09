@@ -1,4 +1,15 @@
 # Encryption protocols
+
+> **DTSF v0.2.0 notice.** This document describes the **classical** encryption
+> protocols of the framework. They remain valid and widely deployed, but their
+> *key establishment and signature* components are broken by a
+> cryptographically relevant quantum computer. For new designs, read this
+> document together with
+> **[Quantum-Encryption-Protocols.md](/Quantum-Encryption-Protocols.md)**,
+> which defines the post-quantum baseline, and see §*Quantum status of the
+> protocols above* at the end of this file for a protocol-by-protocol
+> assessment.
+
 Encryption protocols are cryptographic schemes and algorithms used to secure data communication by encoding it in a way that only authorized parties can access and decipher the information. These protocols ensure confidentiality, integrity, and authenticity of data transmitted over networks. Here are some common encryption protocols:
 
 1. **Secure Sockets Layer (SSL) / Transport Layer Security (TLS)**:
@@ -41,3 +52,34 @@ Data encryption protocols are cryptographic techniques and standards used to pro
    - OpenPGP is an open-source implementation of the PGP protocol, widely used for securing email communication, file encryption, and digital signatures. It is compatible with various email clients and encryption tools, providing interoperability and flexibility.
 
 These data encryption protocols play a critical role in protecting sensitive information from unauthorized access, interception, and tampering. Organizations and individuals use these protocols to secure their data assets and maintain data privacy and security in various applications and environments.
+
+---
+
+# Quantum status of the protocols above (DTSF v0.2.0)
+
+The rule of thumb: **the cipher is usually fine, the key exchange is not.**
+
+| Protocol / algorithm | Quantum status | Why | v0.2.0 action |
+|----------------------|----------------|-----|---------------|
+| **TLS 1.2 / 1.3** | Key exchange **broken** (ECDHE/RSA); ciphers fine | Shor breaks ECDH and RSA | Enable hybrid group **X25519MLKEM768**; TLS 1.3 only |
+| **PGP / GPG / OpenPGP** | **Broken** (RSA/ECC key pairs) | Shor | Migrate to ML-KEM + ML-DSA composite modes; re-encrypt long-lived archives |
+| **IPsec / IKEv2** | Key exchange **broken** | Shor on DH/ECDH | **RFC 9370** additional PQ key exchange, or **RFC 8784** post-quantum PSK |
+| **OpenVPN** | **Broken** (TLS-based handshake) | Shor | Follow the TLS migration; or PSK mode with 256-bit keys |
+| **WireGuard** | **Broken** as-is (Curve25519 handshake) | Shor | Use the pre-shared-key field (256-bit) as an interim quantum-safe measure |
+| **SSH** | Key exchange **broken** | Shor | `mlkem768x25519-sha256` or `sntrup761x25519-sha512`; PQ host and user keys |
+| **AES-128** | **Weakened** to ~64-bit quantum security margin | Grover | Move to **AES-256** |
+| **AES-256** | **Safe** | Grover leaves 128-bit margin; brute force is thermodynamically impossible | Keep — this is the framework's permanent core |
+| **RSA (any size)** | **Broken** | Shor | Replace with ML-KEM (key transport) and ML-DSA (signature) |
+| **Triple DES (3DES)** | **Already obsolete** classically | 64-bit block, sweet32 | Remove entirely |
+| **Blowfish** | **Obsolete** classically | 64-bit block | Remove entirely |
+| **Twofish** | Safe at 256-bit key, but unstandardised in modern protocols | — | Prefer AES-256 |
+| **ECC / ECDH / ECDSA / EdDSA** | **Broken** | Shor — and ECC breaks *earlier* than RSA for a given qubit budget | Replace; hybrid during transition |
+| **Diffie-Hellman (finite field)** | **Broken** | Shor | Replace |
+| **SHA-256** | Weakened margin | Grover | Prefer **SHA-384 / SHA-512 / SHA3-384** |
+| **HMAC-SHA-256** | Safe (key-dependent) but upgrade for consistency | — | HMAC-SHA-384 |
+
+> **Harvest Now, Decrypt Later.** Traffic protected today by any row marked
+> "broken" and recorded by an adversary is decryptable in the future. For data
+> with a secrecy lifetime beyond about five years — health, HR, clinical,
+> legal, defence, archival — this is a present-day exposure, not a future one.
+> See [PQC-Migration-Roadmap.md](/PQC-Migration-Roadmap.md).

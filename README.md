@@ -1,36 +1,90 @@
-# DTSF v0.1.2 (alfa)
-Data Transfer Security Framework refers to a set of protocols, standards, and practices used to ensure the secure transmission of data between systems or across networks. This framework encompasses various security measures aimed at protecting data from unauthorized access, interception, tampering, and other threats during transit. Some key components of a data transfer security framework include:
+# DTSF v0.2.0 (alfa) — Quantum & Multi-Domain Data Transfer Security Framework
 
-**Audiences**
-* U.S. Businesses
-* European Businesses
-* European Individuals
-* Data Protection Authorities
+The Data Transfer Security Framework (DTSF) is a set of protocols, standards, and practices for securing the transmission of data between systems and across networks. It protects data from unauthorized access, interception, tampering, and other threats **while in transit** — the state in which it is most vulnerable.
 
-**I. Overview**
-**Data Transfer Security Framework: Safeguarding Information in Transit**
+**v0.2.0 extends v0.1.2 in five directions:**
 
-Data transfer security is a critical aspect of information security, ensuring that data exchanged between systems, networks, or devices remains confidential, integral, and available. A Data Transfer Security Framework provides guidelines, protocols, and best practices to mitigate risks associated with data transmission and prevent unauthorized access, interception, or tampering. Here are the key components and principles of such a framework:
+1. **Quantum-safe cryptography** — post-quantum algorithms (ML-KEM, ML-DSA, SLH-DSA), hybrid key establishment, QKD as an overlay, QRNG entropy, and crypto-agility as a mandatory control.
+2. **New transport domains** — data no longer travels only over terrestrial networks. v0.2.0 adds profiles for **space**, **aeronautical (aircraft in flight)**, and **underwater (subsea cables and underwater wireless)** links.
+3. **Storage and wireless** — data at rest and radio links treated as first-class domains, driven by the Harvest-Now-Decrypt-Later threat.
+4. **Emerging technology governance** — distributed ledgers and digital identity in government and society; AI, autonomous agents and machine-generated code.
+5. **An explicit speculation boundary** — what physics forbids, what engineering has not yet achieved, and what is vendor fiction.
 
-**1. [Encryption](/Encryption-Protocols.md):** Encryption is fundamental to data transfer security. It involves encoding data into an unreadable format using cryptographic algorithms, making it indecipherable to unauthorized parties. Implementing encryption protocols such as SSL/TLS for web traffic, IPSec for network communication, and PGP for email ensures that data remains confidential during transit.
+**Audiences:** U.S. Businesses · European Businesses · European Individuals · Data Protection Authorities · Space, Aviation, Maritime and Telecommunications Operators · Public Administrations
 
-**2. [Secure Protocols](/DTSF-Protocols.md):** Utilizing secure communication protocols enhances data transfer security. Protocols like HTTPS for web browsing, SFTP/FTPS for file transfer, and SSH for remote access offer encryption and authentication mechanisms to safeguard data in transit. These protocols authenticate endpoints, establish secure channels, and prevent eavesdropping or man-in-the-middle attacks.
+---
 
-**3. Authentication:** Authentication mechanisms verify the identities of communicating parties to ensure trust and integrity during data exchange. Implementing strong authentication methods such as digital certificates, username/password authentication, or multi-factor authentication (MFA) helps prevent unauthorized access and ensures the confidentiality of transmitted data.
+## Document Index
 
-**4. [Access Controls](/Access-Controls.md):** Access controls restrict data access based on user permissions, roles, or privileges. By enforcing access controls at both ends of data transfer, organizations can prevent unauthorized users from intercepting or tampering with sensitive information. Role-based access control (RBAC) and attribute-based access control (ABAC) mechanisms ensure that only authorized users can access and transfer data.
+### Core
 
-**5. Data Integrity:** Ensuring data integrity guarantees that data remains unchanged and uncorrupted during transmission. Hashing algorithms like SHA-256 generate checksums or hash values to verify the integrity of transmitted data. Implementing checksums, digital signatures, or message authentication codes (MACs) detects any unauthorized alterations or modifications to data during transit.
+| Document | Contents |
+|----------|----------|
+| [DTSF Methodology Development.md](/DTSF%20Methodology%20Development.md) | The full methodology paper — technical foundations, transatlantic legal architecture, Zero Trust, DPF principles, lifecycle, and the v0.2.0 quantum and multi-domain chapters |
+| [Quantum-Encryption-Protocols.md](/Quantum-Encryption-Protocols.md) | **The v0.2.0 cryptographic core.** PQC, hybrid KEX, QKD, QRNG, constrained-link profiles Q-A/Q-B/Q-C, algorithm selection matrix |
+| [PQC-Migration-Roadmap.md](/PQC-Migration-Roadmap.md) | Six-phase migration plan, regulatory deadlines, CBOM discovery, metrics, failure modes |
+| [diagram.md](/diagram.md) | Architecture diagrams (ASCII + Mermaid), profile-selection flow, key hierarchy, layered transatlantic transfer |
+| [CHANGELOG.md](/CHANGELOG.md) | What changed from v0.1.2 to v0.2.0 |
 
-**6. Logging and Monitoring:** Continuous logging and monitoring of data transfer activities enable organizations to detect and respond to security incidents promptly. Monitoring network traffic, auditing access logs, and analyzing data transfer patterns help identify anomalies, suspicious activities, or potential security breaches. Implementing intrusion detection systems (IDS) or security information and event management (SIEM) solutions enhances visibility and situational awareness across data transfer channels.
+### Transport domains
 
-**7. Compliance and Standards:** Adhering to regulatory requirements and industry standards is essential for data transfer security. Compliance frameworks like GDPR, HIPAA, or PCI DSS mandate encryption, access controls, and data protection measures to safeguard sensitive information during transit. Following established security standards such as ISO 27001 or NIST guidelines ensures the implementation of robust data transfer security practices.
+| Document | Contents |
+|----------|----------|
+| [Domain-Space.md](/Domain-Space.md) | CCSDS SDLS, BPSec/DTN, telecommand authorisation, pre-launch key injection, optical links, satellite QKD, GNSS integrity |
+| [Domain-Aeronautical.md](/Domain-Aeronautical.md) | Aircraft network domains, ACARS/VDL2/SATCOM/ATN-IPS, ARINC 823, DO-326A, the datalink bandwidth wall, passenger and crew data |
+| [Domain-Underwater.md](/Domain-Underwater.md) | Subsea cables (layered L1/L2/L4 encryption, resilience, sabotage) and underwater wireless (acoustic, Ascon, courier rekey, DTN) |
+| [Wireless-Security.md](/Wireless-Security.md) | Wi-Fi/WPA3, 5G/6G, eSIM, Bluetooth, LoRaWAN, satellite D2D; identifier privacy and wireless sensing |
+| [Storage-Security.md](/Storage-Security.md) | Retention-driven threat model, key hierarchy, crypto-erasure, confidential computing, archival paradox |
+
+### Governance and emerging technology
+
+| Document | Contents |
+|----------|----------|
+| [Blockchain-Governance.md](/Blockchain-Governance.md) | Ledger mechanics, the GDPR conflict, quantum exposure of chains, verifiable credentials, and implementation in government and society |
+| [AI-Machine-Integration.md](/AI-Machine-Integration.md) | Machine identity, prompt injection, RAG access control, machine-generated code, AI Act and GDPR obligations |
+| [Research-Horizons.md](/Research-Horizons.md) | Open hypotheses, the limits of nature, and quantum–gravity frontiers — with an explicit T1–T4 credibility scale |
+
+### Retained from v0.1.2
+
+| Document | Contents |
+|----------|----------|
+| [Encryption-Protocols.md](/Encryption-Protocols.md) | Classical encryption protocols, annotated with quantum vulnerability |
+| [DTSF-Protocols.md](/DSTF-Protocols.md) | Transfer, network, mobility, space, aeronautical and underwater protocols |
+| [Access-Controls.md](/Access-Controls.md) | Access control models, sectoral guidance, and v0.2.0 key-custody controls |
+| [DataTransfer Security Framework.md](/DataTransfer%20Security%20Framework.md) | Original v0.1.x overview and CIA-triad monitoring guidance |
+
+---
+
+## I. Overview — Safeguarding Information in Transit
+
+A Data Transfer Security Framework provides guidelines, protocols, and best practices to mitigate risks associated with data transmission and prevent unauthorized access, interception, or tampering.
+
+**1. [Encryption](/Encryption-Protocols.md):** Encoding data into an unreadable format using cryptographic algorithms. SSL/TLS for web traffic, IPSec for network communication, PGP for email. **v0.2.0:** these remain, but their *key establishment* must become post-quantum — see [Quantum-Encryption-Protocols.md](/Quantum-Encryption-Protocols.md).
+
+**2. [Secure Protocols](/DSTF-Protocols.md):** HTTPS, SFTP/FTPS, SSH authenticate endpoints, establish secure channels, and prevent eavesdropping or man-in-the-middle attacks. **v0.2.0:** extended with CCSDS SDLS, BPSec, ARINC 823, MACsec and Layer-1 optical encryption.
+
+**3. Authentication:** Digital certificates, credentials, and multi-factor authentication verify the identities of communicating parties. **v0.2.0:** signatures migrate to ML-DSA and SLH-DSA; **machines and AI agents get their own identities** ([AI-Machine-Integration.md](/AI-Machine-Integration.md)).
+
+**4. [Access Controls](/Access-Controls.md):** RBAC and ABAC restrict data access by role, attribute or privilege. **v0.2.0:** extended with key custody as an access-control mechanism and capability scoping for autonomous agents.
+
+**5. Data Integrity:** Hashing (now SHA-384/512), digital signatures and MACs detect unauthorized alteration. **v0.2.0:** long-term validation and re-anchoring for records that outlive their algorithms.
+
+**6. Logging and Monitoring:** Continuous logging, IDS and SIEM enable detection and response. **v0.2.0:** provenance logging for agent-initiated transfers; a coherent, GNSS-independent timescale.
+
+**7. Compliance and Standards:** GDPR, HIPAA, PCI DSS, ISO 27001, NIST. **v0.2.0:** adds NIS2, CER, the Cyber Resilience Act, eIDAS 2.0, the EU AI Act, EASA Part-IS, and the PQC migration mandates.
+
+**8. Quantum Readiness (new):** Post-quantum key establishment, 256-bit symmetric baselines, crypto-agility, and a documented migration roadmap with dated milestones.
+
+**9. Domain Profiling (new):** The applicable cryptographic profile is selected by the **physics of the link** — Q-A unconstrained, Q-B amortised, Q-C symmetric-only.
+
+**10. Machine Governance (new):** Autonomous systems that initiate transfers act under scoped, attributable, revocable machine identities.
 
 ![Data Security Transfer Framework](https://github.com/neocristal/DSTF/blob/main/diagram-dstf.jpg?raw=true)
 
-In conclusion, a comprehensive Data Transfer Security Framework encompasses encryption, secure protocols, authentication, access controls, data integrity measures, logging, monitoring, and compliance standards to protect data during transmission. By adopting a layered approach to data transfer security, organizations can mitigate risks, safeguard sensitive information, and maintain trust in their digital communications infrastructure.
+---
 
-**II. Principles**
+## II. Principles (EU-U.S. Data Privacy Framework)
+
 1. Notice
 2. Choice
 3. Accountability for Onward Transfer
@@ -38,101 +92,73 @@ In conclusion, a comprehensive Data Transfer Security Framework encompasses encr
 5. Data Integrity and Purpose Limitation
 6. Access
 7. Recourse, Enforcement and Liability
-**III. Supplemental Principles**
+
+## III. Supplemental Principles
+
 1. Sensitive Data
 2. Journalistic Exceptions
 3. Secondary Liability
 4. Performing Due Diligence and Conducting Audits
-5. The Role of the Data Protection Authorities
-(a) - (b)
-(c)
-(d) - (e)
+5. The Role of the Data Protection Authorities — (a)–(b), (c), (d)–(e)
 6. Self-Certification
 7. Verification
 8. Access
 9. Human Resources Data
 10. Obligatory Contracts for Onward Transfers
-11. Dispute Resolution and Enforcement
-(a) - (c)
-(d) - (e)
-(f) - (g)
+11. Dispute Resolution and Enforcement — (a)–(c), (d)–(e), (f)–(g)
 12. Choice – Timing of Opt Out
 13. Travel Information
 14. Pharmaceutical and Medical Products
 15. Public Record and Publicly Available Information
 16. Access Requests by Public Authorities
 
-**Annex I: Arbitral Model**
-**Introduction**
-A. Scope
-B. Available Remedies
-C. Pre-Arbitration Requirements
-D. Binding Nature of Decisions
-E. Review and Enforcement
-F. The Arbitration Panel
-G. Arbitration Procedures
-H. Costs
+**Annex I: Arbitral Model** — Introduction · A. Scope · B. Available Remedies · C. Pre-Arbitration Requirements · D. Binding Nature of Decisions · E. Review and Enforcement · F. The Arbitration Panel · G. Arbitration Procedures · H. Costs
 
-# Encryption: 
-Encrypting data before transmission to ensure confidentiality. This involves converting plaintext data into ciphertext using cryptographic algorithms and keys, making it unreadable to unauthorized users.
-# Secure Communication Protocols: 
-Using secure communication protocols, such as HTTPS (HTTP over SSL/TLS) for web-based communication, SSH (Secure Shell) for remote access, and SFTP (Secure File Transfer Protocol) for file transfer, to encrypt data in transit and authenticate communication endpoints.
-# Authentication: 
-Implementing authentication mechanisms to verify the identity of communicating parties and ensure that only authorized users or systems can access the data. This may involve username/password authentication, digital certificates, or multi-factor authentication (MFA).
-# Integrity Checking: 
-Employing integrity checking mechanisms, such as message digests (hash functions) or digital signatures, to verify the integrity of transmitted data and detect any unauthorized modifications or tampering.
-# Access Control: 
-Implementing access control measures to restrict access to data during transmission based on the principle of least privilege. This ensures that only authorized users or systems have access to specific data during transit.
-# Key Management: 
-Properly managing encryption keys and digital certificates used for data encryption and authentication. This includes key generation, distribution, storage, rotation, and revocation to prevent unauthorized access or misuse of keys.
-# Data Loss Prevention (DLP): 
-Implementing DLP solutions to monitor and control the movement of sensitive data across networks, preventing data leaks or unauthorized transfers.
-# Secure File Transfer: 
-Using secure file transfer protocols and tools, such as FTPS (FTP over SSL/TLS), AS2 (Applicability Statement 2), or secure email protocols (e.g., S/MIME), to securely transfer files between systems or organizations.
-# Network Segmentation: 
-Segmenting networks and implementing firewalls or network access controls to isolate sensitive data and prevent unauthorized access or interception by malicious actors.
-# Compliance and Standards: 
-Adhering to industry standards and regulatory requirements for data protection and privacy, such as GDPR (General Data Protection Regulation), HIPAA (Health Insurance Portability and Accountability Act), or PCI DSS (Payment Card Industry Data Security Standard).
+---
 
-By implementing a robust data transfer security framework, organizations can mitigate the risk of data breaches, protect sensitive information, and ensure compliance with relevant regulations and standards.
+## IV. The Security Components
 
-# Programming data security 
-Programming data security refers to the practices and techniques employed by developers to protect sensitive data within software applications. This involves implementing various security measures to prevent unauthorized access, disclosure, alteration, or destruction of data. Some key aspects of programming data security include:
-# Encryption: 
-Utilizing encryption algorithms to encode sensitive data at rest (stored data) and in transit (data being transmitted over networks). This ensures that even if attackers gain access to the data, it remains unreadable without the decryption key.
-# Access Control: 
-Implementing access control mechanisms to restrict access to sensitive data only to authorized users or roles. This involves authentication (verifying the identity of users) and authorization (determining what actions users are allowed to perform).
-# Input Validation: 
-Validating and sanitizing all input received by the application to prevent common attacks such as SQL injection, cross-site scripting (XSS), and command injection. Input validation ensures that only expected and safe data is processed by the application.
-# Secure Storage: 
-Storing sensitive data securely by following best practices such as using secure databases, hashing passwords instead of storing them in plain text, and securely managing encryption keys.
-# Secure Communication: 
-Ensuring secure communication between different components of the application by using protocols like HTTPS/TLS to encrypt data transmission over networks.
-# Secure Coding Practices: 
-Following secure coding practices to minimize the risk of security vulnerabilities in the application's code. This includes avoiding hardcoded credentials, using parameterized queries to prevent SQL injection, and validating user input before processing it.
-# Data Masking and Anonymization: 
-Implementing techniques such as data masking and anonymization to protect sensitive data during testing and development stages, as well as in non-production environments.
-# Auditing and Logging: 
-Implementing robust logging and auditing mechanisms to track access to sensitive data, monitor user activity, and detect suspicious behavior or security incidents.
-# Regular Security Testing: 
-Conducting regular security testing, including static code analysis, dynamic application security testing (DAST), and penetration testing, to identify and remediate security vulnerabilities in the application.
-# Security Awareness Training: 
-Providing security awareness training to developers and other stakeholders to educate them about common security threats, best practices for securing data, and the importance of adhering to security policies and guidelines.
+**Encryption** — Converting plaintext into ciphertext so it is unreadable to unauthorized users. *v0.2.0: AES-256 minimum; key establishment via hybrid ML-KEM.*
 
-By implementing these programming data security measures, developers can enhance the security posture of their applications and protect sensitive data from unauthorized access and malicious activities.
+**Secure Communication Protocols** — HTTPS, SSH, SFTP encrypt data in transit and authenticate endpoints. *v0.2.0: plus domain protocols for space, air and subsea.*
 
-# The procedure involves several steps to ensure the security of data throughout its lifecycle:
-# 1. *Encryption*:
-Upon receiving the primary data, encrypt it using strong encryption algorithms and keys. This ensures that the data is protected from unauthorized access or interception during transit.
-# 2. *Input Validation*: 
-Before processing the data, validate and sanitize it to prevent common security vulnerabilities such as SQL injection, cross-site scripting (XSS), and command injection. Input validation ensures that only expected and safe data is processed further.
-# 3. *Access Control*:
-Implement access control mechanisms to restrict access to the data based on user roles and permissions. This ensures that only authorized users or systems can access and manipulate the data.
-# 4. *Secure Processing*:
-Process the data in a secure environment using secure coding practices and frameworks. This includes avoiding vulnerabilities such as buffer overflows, insecure deserialization, and improper error handling.
-# 5. *Secure Transfer*:
-Once the data is processed, transfer it to a secure storage location using secure communication protocols such as HTTPS/TLS. This ensures that the data remains encrypted and protected during transit.
-# 6. *Secure Storage*:
-Store the data in a secure storage system with proper encryption, access controls, and data integrity mechanisms. This prevents unauthorized access, tampering, or loss of data.
+**Authentication** — Verifying the identity of communicating parties: credentials, digital certificates, MFA. *v0.2.0: post-quantum certificates; machine identity for agents.*
 
-By following this procedure, organizations can ensure that data is securely handled, processed, and stored throughout its lifecycle, minimizing the risk of security breaches and protecting sensitive information.
+**Integrity Checking** — Message digests and digital signatures detect unauthorized modification. *v0.2.0: SHA-384+; long-term validation for archives.*
+
+**Access Control** — Least privilege applied to data in transit. *v0.2.0: key custody as enforcement; capability scoping for agents.*
+
+**Key Management** — Generation, distribution, storage, rotation and revocation. *v0.2.0: the hardest part of the migration; see the key hierarchy in [diagram.md](/diagram.md) §4.*
+
+**Data Loss Prevention (DLP)** — Monitoring and controlling the movement of sensitive data. *v0.2.0: extended to prompts, model outputs and agent egress.*
+
+**Secure File Transfer** — FTPS, AS2, S/MIME. *v0.2.0: PQ-capable variants; signed software distribution for aircraft and spacecraft.*
+
+**Network Segmentation** — Firewalls and network access controls isolate sensitive data. *v0.2.0: aircraft domain separation; ground-segment micro-segmentation; agent trust-domain isolation.*
+
+**Compliance and Standards** — GDPR, HIPAA, PCI DSS and the instruments listed under pillar 7.
+
+---
+
+## V. Secure Data Lifecycle Procedure
+
+1. **Encryption** — encrypt on receipt using strong, quantum-safe algorithms and managed keys.
+2. **Input Validation** — validate and sanitize before processing; treat model output as untrusted input.
+3. **Access Control** — enforce least privilege in real time; scope machine identities.
+4. **Secure Processing** — secure coding practices, memory safety, no information leakage in errors.
+5. **Secure Transfer** — apply the domain profile (Q-A / Q-B / Q-C) and layer independent protections.
+6. **Secure Storage** — AES-256 at rest under PQ-wrapped keys, per-record DEKs, WORM copies, renewal cycle.
+7. **Disposal** — crypto-erasure with auditable destruction evidence.
+
+---
+
+## Versioning
+
+| Version | Date | Summary |
+|---------|------|---------|
+| v0.1.2 (alfa) | 2026-01 | Classical framework: seven pillars, DPF principles, Zero Trust, lifecycle |
+| **v0.2.0 (alfa)** | **2026-08** | **Quantum-safe core; space, aeronautical, underwater, wireless and storage domains; blockchain, AI and research annexes** |
+
+DTSF is an evolving, open framework. This is an alpha release intended for review and comment — it is guidance, not a certification standard, and it does not constitute legal advice.
+
+**Licence:** see [LICENSE](/LICENSE) · **Security policy:** see [SECURITY.md](/SECURITY.md)

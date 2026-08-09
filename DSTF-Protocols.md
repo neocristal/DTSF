@@ -55,3 +55,52 @@ Space protocols refer to the communication protocols and standards used for data
 6. **Deep Space Network (DSN) Protocols**: DSN protocols are used for communication between deep space probes, rovers, and orbiters and NASA's Deep Space Network ground stations. These protocols include standards and procedures for scheduling, tracking, and data transfer during deep space missions.
 
 These space protocols play a critical role in enabling communication and data transfer between spacecraft and ground stations, facilitating space exploration, scientific research, satellite operations, and Earth observation missions. They are designed to meet the unique requirements and challenges of space communication, ensuring reliable and efficient data transmission in the harsh environment of space.
+
+# Space Security Protocols (new in DTSF v0.2.0)
+The protocols listed above provide transport, not security. The following add confidentiality, integrity and authentication to space links, and are mandatory under the v0.2.0 space profile — see [Domain-Space.md](/Domain-Space.md).
+
+1. **CCSDS 355.0-B — Space Data Link Security (SDLS)**: Authenticated encryption applied to TC, TM and AOS transfer frames. The core space link security protocol. Uses AES in Galois/Counter Mode; DTSF v0.2.0 requires the 256-bit key length.
+2. **CCSDS 355.1-B — SDLS Extended Procedures (SDLS-EP)**: On-orbit key management, over-the-air rekeying (OTAR), security association management and monitoring. This is what makes a multi-decade mission survivable when a key must be replaced.
+3. **CCSDS 352.0-B — Cryptographic Algorithms**: The approved algorithm set for space links (AES-GCM for authenticated encryption, AES-CMAC for authentication-only).
+4. **CCSDS 356.0-B — Network Layer Security Adaptation Profile**: IPsec profiled for space network segments.
+5. **CCSDS 350.x-G Green Books**: Security architecture, threat analysis and key management guidance for mission designers.
+6. **BPSec (RFC 9172) with default security contexts (RFC 9173)**: End-to-end integrity (BIB-HMAC-SHA2) and confidentiality (BCB-AES-GCM) for Bundle Protocol v7 traffic, surviving store-and-forward relaying through intermediate custodians. **The same profile is used for underwater store-carry-forward networks.**
+
+# General Aeronautical Protocols
+Aeronautical data transfer protocols connect aircraft in flight to airline operations, air traffic control and maintenance systems. They operate under severe bandwidth, latency and safety constraints, and most were designed before security was a requirement. Full analysis in [Domain-Aeronautical.md](/Domain-Aeronautical.md).
+
+1. **ACARS (Aircraft Communications Addressing and Reporting System)**: The character-oriented messaging system used since the 1970s for operational messages — flight plans, load sheets, fuel figures, maintenance reports. **Historically transmitted in plaintext** and routinely collected by public receiver networks. Carried over VHF, HF or satellite bearers.
+2. **VDL Mode 2 (VHF Digital Link)**: The digital VHF bearer for ACARS and ATN traffic, 31.5 kbit/s raw and shared across all aircraft in a coverage volume.
+3. **HFDL (HF Data Link)**: Long-range oceanic bearer at 300–1 800 bit/s, used where VHF and satellite are unavailable.
+4. **ATN/OSI and ATN/IPS (ICAO Doc 9896)**: The Aeronautical Telecommunication Network. The IPS (IP suite) variant is the strategic target because it permits IPsec and TLS, and therefore post-quantum key establishment.
+5. **CPDLC (Controller–Pilot Data Link Communications)** and **ADS-C (Contract)**: Air traffic control messaging and position reporting over ATN.
+6. **ADS-B (Automatic Dependent Surveillance–Broadcast)**: Unencrypted, **unauthenticated** position broadcast. Spoofable by design; integrity must be recovered through multilateration and sensor fusion rather than by adding cryptography to the broadcast alone.
+7. **LDACS (L-band Digital Aeronautical Communications System)**: The future terrestrial datalink, standardised with a security architecture from the outset and with post-quantum hybrid key exchange under active research.
+8. **AeroMACS**: Broadband airport-surface network (WiMAX-derived) for gate and apron operations.
+9. **Aeronautical SATCOM (Iridium Certus, SwiftBroadband-Safety)**: Broadband and safety-service satellite links, 20–700 kbit/s, which are the practical place to perform post-quantum handshakes for an aircraft in flight.
+10. **ARINC 615A / 827**: Data loading and Electronic Distribution of Software — the supply-chain path for loadable software parts, requiring signed crates and, under v0.2.0, hash-based post-quantum signatures.
+11. **ARINC 823 (ACARS Message Security, AMS)**: Application-layer authentication and encryption for ACARS, independent of the bearer. The correct place to apply security to legacy datalinks.
+
+# General Underwater Protocols
+Radio does not propagate through seawater. Underwater data transfer therefore splits into optical fibre (subsea cables) and acoustic/optical wireless. Full analysis in [Domain-Underwater.md](/Domain-Underwater.md).
+
+1. **Subsea fibre optic transport (ITU-T G.709 OTN, DWDM)**: Carries approximately 99 % of intercontinental internet traffic. Layer-1 encryption in transponders (AES-256-GCM) protects everything on the line, including management traffic, at line rate.
+2. **MACsec (IEEE 802.1AE)**: Layer-2 hop-by-hop authenticated encryption at cable landing stations and backhaul, keyed through MKA/802.1X.
+3. **JANUS (NATO STANAG 4748 / ANEP-87)**: The first international standard for digital underwater acoustic communication. Provides interoperable discovery and signalling at very low bit rates.
+4. **Underwater acoustic modems (proprietary and standards-based)**: 80 bit/s to a few kbit/s at kilometre ranges, with 0.67 s of latency per kilometre, heavy multipath and high bit-error rates. These characteristics make interactive asymmetric handshakes infeasible.
+5. **Underwater optical (blue-green) links**: 1–100 Mbit/s over 10–100 m in clear water, used for AUV docking and data offload.
+6. **Magnetic induction links**: Short-range (1–20 m), unaffected by turbidity, used for sensor and connector-free interfaces.
+7. **Bundle Protocol v7 / BPSec (RFC 9171 / 9172)**: Delay-tolerant store-carry-forward networking for autonomous vehicles that collect data submerged and transmit on surfacing — architecturally identical to deep-space relay, and secured with the same profile.
+
+# Security posture summary
+| Protocol family | Confidentiality | Authentication | v0.2.0 requirement |
+|-----------------|-----------------|----------------|--------------------|
+| HTTP, FTP, SMTP, POP3, IMAP, DNS, LDAP (plain) | None | None | Prohibited for regulated data; use the secure variants |
+| HTTPS, SFTP, SCP, LDAPS, DoT/DoH | Yes | Yes | Hybrid post-quantum key exchange |
+| ACARS, HFDL (bare) | None | None | Wrap in ARINC 823 AMS |
+| ADS-B | None | **None, by design** | Integrity via fusion, not crypto |
+| ATN/IPS | Yes | Yes | Hybrid PQC IPsec/TLS |
+| CCSDS TC/TM (bare) | None | None | SDLS with AES-256-GCM |
+| Bundle Protocol v7 | Via BPSec | Via BPSec | BPSec mandatory on relayed paths |
+| OTN / DWDM (bare) | None | None | Layer-1 AES-256-GCM plus an independent upper layer |
+| Underwater acoustic (bare) | None | None | Profile Q-C: pre-shared keys, Ascon/AES-256, ratchet |
