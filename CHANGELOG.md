@@ -62,7 +62,7 @@ All notable changes to the Data Transfer Security Framework are documented here.
 * **`index.html`** — rebuilt as the v0.2.0 infographic. Fully self-contained (no CDN scripts, no external stylesheets), responsive, light/dark aware.
 * **`index_page.html`** — rebuilt as the v0.2.0 interactive explorer: tabbed navigation, a per-domain detail browser, a filterable algorithm reference, and a searchable catalogue of all 110 controls. Vanilla JavaScript only; the Tailwind and Chart.js CDN dependencies were removed.
 * **`DTSF Methodology Development.docx`** — regenerated from the updated Markdown source, including the v0.2.0 chapters, the extended works-cited list and a cover page.
-* **`infographic-v0.1.2.html`** — the previous (v0.1.2) infographic, retained for reference in its sanitized form. It still depends on external CDN scripts and describes the superseded framework.
+* **`infographic-v0.1.2.html`** — the previous (v0.1.2) infographic, retained for reference. Six generation-environment harness scripts were stripped from it (Firebase bootstrap and project identifiers, a `getUserMedia` hook, a `fetch` interceptor, `console` overrides and a cross-origin `postMessage` bridge); none of them were part of the infographic and none belong in a published artifact. It still loads Tailwind and Chart.js from public CDNs and describes the superseded framework.
 
 ### Security housekeeping
 
